@@ -1,6 +1,7 @@
 package com.Practice.Employee.Management.ServiceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import com.Practice.Employee.Management.Modal.Employee;
 import com.Practice.Employee.Management.Repository.EmployeeRepository;
 import com.Practice.Employee.Management.Repository.ResponseCodeRespository;
 import com.Practice.Employee.Management.ResponseModal.EmployeeResponse;
+import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.EmployeeService;
 import com.Practice.Employee.Management.utils.ResponseCode;
 
@@ -96,6 +98,31 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		return response;
 	}
+
+	@Override
+	public EmployeeResponse findById(Long id) {
+		
+		EmployeeResponse response = new EmployeeResponse();
+		String operation = request.getRequestURI();
+		
+		Optional<Employee> result = employeeRepository.findById(id);
+		if(result.isPresent()) {
+			Employee employee = result.get();
+			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+			response.setIsSuccess(true);
+			response.setStatus("Success");
+			response.setMessage(msg);
+			response.setEmployee(employee);
+		}else {
+			String msg = responseCode.getMessageByCode(ResponseCode.NOT_FOUND, operation);
+			response.setIsSuccess(false);
+			response.setStatus("Failed");
+			response.setMessage(msg);
+		}
+		return response;
+	}
+
+	
 	
 	
 	

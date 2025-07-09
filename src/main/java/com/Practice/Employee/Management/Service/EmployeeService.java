@@ -13,6 +13,8 @@ public interface EmployeeService {
 
 	EmployeeResponse findAll();
 
+	EmployeeResponse findById(Long id);
+
 
 
 }

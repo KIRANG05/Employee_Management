@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +42,11 @@ public class EmployeeController {
 	@GetMapping("/employeeDetails")
 	public EmployeeResponse getAllEmployees() {
 		return employeeService.findAll();
+	}
+	
+	@GetMapping("/employeeDetails/{id}")
+	public EmployeeResponse getEmployeeById(@PathVariable Long id) {
+		return employeeService.findById(id);
 	}
 	
 	
