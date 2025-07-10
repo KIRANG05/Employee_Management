@@ -114,14 +114,100 @@ public class EmployeeServiceImpl implements EmployeeService {
 			response.setMessage(msg);
 			response.setEmployee(employee);
 		}else {
-			String msg = responseCode.getMessageByCode(ResponseCode.NOT_FOUND, operation);
+			String msg = responseCode.getMessageByCode(ResponseCode.DATA_NOT_FOUND, operation);
+			response.setIsSuccess(false);
+			response.setStatus("Error");
+			response.setMessage(msg);
+		}
+		return response;
+	}
+
+	@Override
+	public GenericResponse updateById(Employee employee, Long id) {
+		
+		GenericResponse response = new GenericResponse();
+		String operation = request.getRequestURI();
+		
+		Optional<Employee> result = employeeRepository.findById(id);
+		
+		if(result.isPresent()) {
+			
+			employeeRepository.save(employee);
+			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_UPDATE_SUCCESS, operation);
+			response.setMessage(msg);
+			response.setIsSuccess(true);
+			response.setStatus("Success");
+			
+		} else {
+			String msg = responseCode.getMessageByCode(ResponseCode.DATA_NOT_FOUND, operation);
+			response.setMessage(msg);
+			response.setIsSuccess(false);
+			response.setStatus("Failed");
+		}
+		return response;
+	}
+
+	
+	public GenericResponse partialUpdateById(Employee employee, Long id) {
+		
+		GenericResponse response = new GenericResponse();
+		String operation = request.getRequestURI();
+		
+		Optional<Employee>	result = employeeRepository.findById(id);
+		
+		if(result.isPresent()) {
+			
+			Employee employeeV1 = result.get();
+			
+			if(employee.getName() != null) {
+				employeeV1.setName(employee.getName());
+			}
+			if(employee.getCompany() != null) {
+				employeeV1.setCompany(employee.getCompany());
+			}
+			if(employee.getSalary() != null) {
+				employeeV1.setSalary(employee.getSalary());
+			}
+			employeeRepository.save(employeeV1);
+			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_UPDATE_SUCCESS, operation);
+			response.setStatus("Success");
+			response.setMessage(msg);
+			response.setIsSuccess(true);		
+		}else {
+			String msg = responseCode.getMessageByCode(ResponseCode.DATA_NOT_FOUND, operation);
+			response.setStatus("Failed");
+			response.setMessage(msg);
+			response.setIsSuccess(false);
+		}
+		
+		return response;
+	}
+
+	@Override
+	public GenericResponse deleteById(Long id) {
+		
+		GenericResponse response = new GenericResponse();
+		String operation = request.getRequestURI();
+		
+		Optional<Employee> result = employeeRepository.findById(id);
+		
+		if(result.isPresent()) { 
+			
+			Employee employee = result.get();
+			employeeRepository.delete(employee);
+			
+			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_DELETE_SUCCESS, operation);
+			response.setIsSuccess(true);
+			response.setStatus("Success");
+			response.setMessage(msg);
+		}else {
+			String msg = responseCode.getMessageByCode(ResponseCode.DATA_NOT_FOUND, operation);
 			response.setIsSuccess(false);
 			response.setStatus("Failed");
 			response.setMessage(msg);
 		}
 		return response;
 	}
-
 	
 	
 	

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.Practice.Employee.Management.Modal.Employee;
 import com.Practice.Employee.Management.ResponseModal.EmployeeResponse;
+import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 
 public interface EmployeeService {
 
@@ -14,6 +15,12 @@ public interface EmployeeService {
 	EmployeeResponse findAll();
 
 	EmployeeResponse findById(Long id);
+
+	GenericResponse updateById(Employee employee, Long id);
+
+	GenericResponse partialUpdateById(Employee employee, Long id);
+
+	GenericResponse deleteById(Long id);
 
 
 
