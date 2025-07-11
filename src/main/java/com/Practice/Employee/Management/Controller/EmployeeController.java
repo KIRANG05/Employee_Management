@@ -43,7 +43,6 @@ public class EmployeeController {
 			return ResponseEntity
 					.status(HttpStatus.CREATED)
 					.body(response);
-
 		} else {
 			return ResponseEntity
 					.status(HttpStatus.BAD_REQUEST)
