@@ -1,5 +1,6 @@
 package com.Practice.Employee.Management.Modal;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,8 +15,11 @@ public class Employee {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@Column(name = "Employee_Name", nullable = false)
 	private String name;
+	@Column(name = "Employee_Company")
 	private String company;
+	@Column(name = "Employee_Salary")
 	private Double salary;
 	
 	public Long getId() {

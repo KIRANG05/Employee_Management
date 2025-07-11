@@ -3,6 +3,8 @@ package com.Practice.Employee.Management.ServiceImpl;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,192 +27,207 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Autowired
 	ResponseCodeRespository responseCode;
 	
-	@Autowired
-	private HttpServletRequest request;
+	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 	
 	@Override
-	public EmployeeResponse save(Employee employee) {
-		Employee result=employeeRepository.save(employee);
+	public EmployeeResponse save(Employee employee, String operation) {
+		logger.info("Save Operation Initiated For Employee: {}", employee);
 		
 		EmployeeResponse response = new EmployeeResponse();
-		String operation = request.getRequestURI();
-		
-		if(result!= null) {
-			String msg=responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_SUCCESS, operation);
+		Employee result = employeeRepository.save(employee);
+
+		if (result != null) {
+			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_SUCCESS, operation);
 			response.setIsSuccess(true);
 			response.setMessage(msg);
 			response.setStatus("Success");
 			response.setEmployee(result);
-		}else {
+			
+			logger.info("Employee Saved Successfully With ID: {}", result.getId());
+		} else {
 			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_FAILED, operation);
 			response.setIsSuccess(false);
 			response.setMessage(msg);
 			response.setStatus("Failed");
+			
+			logger.error("Failed To Save Employee — Repository Did Not Return Entity. Name: {}", employee.getName());
 		}
 		return response;
 	}
 
 	@Override
-	public EmployeeResponse saveAll(List<Employee> employees) {
+	public EmployeeResponse saveAll(List<Employee> employees, String operation) {
+		logger.info("Batch Save Operation Initiated — Total Employees To Save: {}. Operation: {}", employees.size(), operation);
 		
 		EmployeeResponse response = new EmployeeResponse();
-		String operation = request.getRequestURI();
-		
-		List<Employee> result =  employeeRepository.saveAll(employees);
-		
-		if(result != null) {
+		List<Employee> result = employeeRepository.saveAll(employees);
+
+		if (result != null) {
 			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_SUCCESS, operation);
 			response.setStatus("Success");
 			response.setIsSuccess(true);
 			response.setMessage(msg);
 			response.setEmployees(employees);
 			
-		}else {
+			logger.info("Batch Save Successful — Saved {} Employees. Operation: {}", result.size(), operation);
+		} else {
 			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_FAILED, operation);
 			response.setStatus("Failed");
 			response.setIsSuccess(false);
 			response.setMessage(msg);
+			
+			logger.error("Batch Save Failed — Repository Returned Null Or Empty. Operation: {}", operation);
 		}
 		return response;
 	}
 
 	@Override
-	public EmployeeResponse findAll() {
+	public EmployeeResponse findAll(String operation) {
+		logger.info("FindAll Operation Initiated");
 		
 		EmployeeResponse response = new EmployeeResponse();
-		String operation = request.getRequestURI();
-		
 		List<Employee> result = employeeRepository.findAll();
-		
-		if(result != null) {
+
+		if (result != null) {
 			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
 			response.setStatus("Success");
 			response.setIsSuccess(true);
 			response.setMessage(msg);
 			response.setEmployees(result);
-		}else {
+			
+			logger.info("FindAll Successful — Total Employees Found: {}", result.size());
+		} else {
 			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
 			response.setStatus("Failed");
 			response.setIsSuccess(false);
 			response.setMessage(msg);
 			response.setEmployees(result);
+			
+			logger.error("FindAll Failed — No Employees Found. Operation: {}", operation);
 		}
-
 		return response;
 	}
 
 	@Override
-	public EmployeeResponse findById(Long id) {
+	public EmployeeResponse findById(Long id, String operation) {
+		logger.info("FindById Operation Initiated For ID: {}", id);
 		
 		EmployeeResponse response = new EmployeeResponse();
-		String operation = request.getRequestURI();
-		
 		Optional<Employee> result = employeeRepository.findById(id);
-		if(result.isPresent()) {
+		
+		if (result.isPresent()) {
 			Employee employee = result.get();
 			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
 			response.setIsSuccess(true);
 			response.setStatus("Success");
 			response.setMessage(msg);
 			response.setEmployee(employee);
-		}else {
+			
+			logger.info("Employee Found — ID: {}, Name: {}, Company: {}", 
+	                 employee.getId(), employee.getName(), employee.getCompany());
+		} else {
 			String msg = responseCode.getMessageByCode(ResponseCode.DATA_NOT_FOUND, operation);
 			response.setIsSuccess(false);
-			response.setStatus("Error");
+			response.setStatus("Failed");
 			response.setMessage(msg);
+			
+			logger.error("Employee Not Found — ID: {}, Operation: {}", id, operation);
 		}
 		return response;
-	}
+	}		
 
 	@Override
-	public GenericResponse updateById(Employee employee, Long id) {
+	public GenericResponse updateById(Employee employee, Long id, String operation) {
+		logger.info("Update Operation Initiated For ID: {}", id);
 		
 		GenericResponse response = new GenericResponse();
-		String operation = request.getRequestURI();
-		
 		Optional<Employee> result = employeeRepository.findById(id);
-		
-		if(result.isPresent()) {
-			
+
+		if (result.isPresent()) {
+
 			employeeRepository.save(employee);
 			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_UPDATE_SUCCESS, operation);
 			response.setMessage(msg);
 			response.setIsSuccess(true);
 			response.setStatus("Success");
 			
+			logger.info("Employee Updated Successfully — ID: {}, Name: {}", employee.getId(), employee.getName());
 		} else {
 			String msg = responseCode.getMessageByCode(ResponseCode.DATA_NOT_FOUND, operation);
 			response.setMessage(msg);
 			response.setIsSuccess(false);
 			response.setStatus("Failed");
+			
+			logger.error("Update Failed — Employee Not Found. ID: {}, Operation: {}", id, operation);
 		}
 		return response;
 	}
 
-	
-	public GenericResponse partialUpdateById(Employee employee, Long id) {
+	@Override
+	public GenericResponse partialUpdateById(Employee employee, Long id, String operation) {
+		logger.info("Partial Update Initiated For ID: {}", id);
 		
 		GenericResponse response = new GenericResponse();
-		String operation = request.getRequestURI();
-		
-		Optional<Employee>	result = employeeRepository.findById(id);
-		
-		if(result.isPresent()) {
-			
+		Optional<Employee> result = employeeRepository.findById(id);
+
+		if (result.isPresent()) {
+
 			Employee employeeV1 = result.get();
-			
-			if(employee.getName() != null) {
+
+			if (employee.getName() != null) {
 				employeeV1.setName(employee.getName());
 			}
-			if(employee.getCompany() != null) {
+			if (employee.getCompany() != null) {
 				employeeV1.setCompany(employee.getCompany());
 			}
-			if(employee.getSalary() != null) {
+			if (employee.getSalary() != null) {
 				employeeV1.setSalary(employee.getSalary());
 			}
 			employeeRepository.save(employeeV1);
 			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_UPDATE_SUCCESS, operation);
 			response.setStatus("Success");
 			response.setMessage(msg);
-			response.setIsSuccess(true);		
-		}else {
+			response.setIsSuccess(true);
+			
+			logger.info("Partial Update Successful — ID: {}", id);
+		} else {
 			String msg = responseCode.getMessageByCode(ResponseCode.DATA_NOT_FOUND, operation);
 			response.setStatus("Failed");
 			response.setMessage(msg);
 			response.setIsSuccess(false);
+			
+			logger.error("Partial Update Failed — Employee Not Found. ID: {}, Operation: {}", id, operation);
 		}
-		
 		return response;
 	}
 
 	@Override
-	public GenericResponse deleteById(Long id) {
-		
+	public GenericResponse deleteById(Long id, String operation) {
+		logger.info("Delete Operation Initiated For Employee ID: {}", id);
+
 		GenericResponse response = new GenericResponse();
-		String operation = request.getRequestURI();
-		
 		Optional<Employee> result = employeeRepository.findById(id);
-		
-		if(result.isPresent()) { 
-			
+
+		if (result.isPresent()) {
+
 			Employee employee = result.get();
 			employeeRepository.delete(employee);
-			
+
 			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_DELETE_SUCCESS, operation);
 			response.setIsSuccess(true);
 			response.setStatus("Success");
 			response.setMessage(msg);
-		}else {
+			
+			logger.info("Employee Deleted Successfully — ID: {}, Name: {}", employee.getId(), employee.getName());
+		} else {
 			String msg = responseCode.getMessageByCode(ResponseCode.DATA_NOT_FOUND, operation);
 			response.setIsSuccess(false);
 			response.setStatus("Failed");
 			response.setMessage(msg);
+			
+			logger.error("Delete Failed — Employee Not Found. ID: {}, Operation: {}", id, operation);
 		}
 		return response;
 	}
 	
-	
-	
-	
-
 }

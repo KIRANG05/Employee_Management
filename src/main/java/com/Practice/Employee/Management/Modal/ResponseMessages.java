@@ -1,5 +1,6 @@
 package com.Practice.Employee.Management.Modal;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,8 +14,11 @@ public class ResponseMessages {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@Column(name = "Message_Code")
 	private String code;
+	@Column(name ="Operation")
 	private String operation;
+	@Column(name = "Message")
 	private String message;
 	
 	public ResponseMessages() { }

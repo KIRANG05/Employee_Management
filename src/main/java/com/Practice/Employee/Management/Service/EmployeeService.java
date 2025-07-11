@@ -8,19 +8,19 @@ import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 
 public interface EmployeeService {
 
-	EmployeeResponse save(Employee employee);
+	EmployeeResponse save(Employee employee, String operation);
 
-	EmployeeResponse saveAll(List<Employee> employees);
+	EmployeeResponse saveAll(List<Employee> employees, String operation);
 
-	EmployeeResponse findAll();
+	EmployeeResponse findAll(String operation);
 
-	EmployeeResponse findById(Long id);
+	EmployeeResponse findById(Long id, String operation);
 
-	GenericResponse updateById(Employee employee, Long id);
+	GenericResponse updateById(Employee employee, Long id, String operation);
 
-	GenericResponse partialUpdateById(Employee employee, Long id);
+	GenericResponse partialUpdateById(Employee employee, Long id, String operation);
 
-	GenericResponse deleteById(Long id);
+	GenericResponse deleteById(Long id, String operation);
 
 
 
