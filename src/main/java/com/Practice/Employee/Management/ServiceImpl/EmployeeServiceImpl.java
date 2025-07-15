@@ -22,10 +22,10 @@ import jakarta.servlet.http.HttpServletRequest;
 public class EmployeeServiceImpl implements EmployeeService {
 	
 	@Autowired
-	EmployeeRepository employeeRepository;
+	private EmployeeRepository employeeRepository;
 
 	@Autowired
-	ResponseCodeRespository responseCode;
+	private ResponseCodeRespository responseCode;
 	
 	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 	

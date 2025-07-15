@@ -11,5 +11,7 @@ public class ResponseCode {
 	public static final String DATA_NOT_FOUND = "E003";
 	public static final String EMPLOYEE_UPDATE_SUCCESS = "A003";
 	public static final String EMPLOYEE_UPDATE_FAILED = "E004";
+	public static final String USER_REGISTER_SUCCESS = "A004";
+	public static final String USERNAME_ALREADY_EXISTS = "E005";
 
 }

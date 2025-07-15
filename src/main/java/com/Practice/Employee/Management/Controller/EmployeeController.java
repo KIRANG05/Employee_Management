@@ -30,7 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class EmployeeController {
 	
 	@Autowired
-	EmployeeService employeeService;
+	private EmployeeService employeeService;
 	
 	
 	
