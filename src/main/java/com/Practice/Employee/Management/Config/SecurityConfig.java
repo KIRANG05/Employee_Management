@@ -14,6 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import com.Practice.Employee.Management.Security.CustomUserDetailsService;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -35,6 +38,19 @@ public class SecurityConfig {
 		return new BCryptPasswordEncoder();
 	}
 	
+	@Bean
+	AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+		return configuration.getAuthenticationManager();
+		
+	}
+	
+	public AuthenticationProvider authenticationProvider(CustomUserDetailsService userDetailService) {
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+		provider.setUserDetailsService(userDetailService);
+		provider.setPasswordEncoder(passwordEncoder());
+		return provider;
+		
+	}
 	
 	
 }

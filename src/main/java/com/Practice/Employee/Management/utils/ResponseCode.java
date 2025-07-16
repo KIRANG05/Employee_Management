@@ -13,5 +13,6 @@ public class ResponseCode {
 	public static final String EMPLOYEE_UPDATE_FAILED = "E004";
 	public static final String USER_REGISTER_SUCCESS = "A004";
 	public static final String USERNAME_ALREADY_EXISTS = "E005";
+	public static final String LOGIN_SUCCESS = "A005";
 
 }
