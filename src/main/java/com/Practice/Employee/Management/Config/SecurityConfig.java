@@ -14,14 +14,25 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.Practice.Employee.Management.Security.CustomUserDetailsService;
+import com.Practice.Employee.Management.Security.JwtAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	
+	private JwtAuthenticationFilter jwtFilter;
+	
+	public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+		this.jwtFilter = jwtFilter;
+	}
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -29,7 +40,8 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/register", "/auth/login").permitAll()
 						.anyRequest()
 						.authenticated())
-						.httpBasic(withDefaults())
+//						.httpBasic(withDefaults()) // This is for Basic Auth
+						.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 						.build();
 	}
 	
@@ -49,7 +61,7 @@ public class SecurityConfig {
 		provider.setUserDetailsService(userDetailService);
 		provider.setPasswordEncoder(passwordEncoder());
 		return provider;
-		
+		 
 	}
 	
 	

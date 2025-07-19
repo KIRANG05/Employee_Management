@@ -14,6 +14,7 @@ import com.Practice.Employee.Management.Repository.ResponseCodeRespository;
 import com.Practice.Employee.Management.Repository.UserRepository;
 import com.Practice.Employee.Management.ResponseModal.UserResponse;
 import com.Practice.Employee.Management.Security.CustomUserDetails;
+import com.Practice.Employee.Management.Security.JwtService;
 import com.Practice.Employee.Management.Service.AuthService;
 import com.Practice.Employee.Management.utils.ResponseCode;
 
@@ -29,10 +30,13 @@ public class AuthServiceImpl implements AuthService {
 	private final PasswordEncoder passwordEncoder;
 	
 	private final AuthenticationManager authenticationManager;
+	
+	private final JwtService jwtService;
 
-	public AuthServiceImpl(PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+	public AuthServiceImpl(PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
 		this.passwordEncoder = passwordEncoder;
 		this.authenticationManager = authenticationManager;
+		this.jwtService = jwtService;
 	}
 
 
@@ -65,12 +69,15 @@ public class AuthServiceImpl implements AuthService {
 		 
 		 CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 		Users user =  userDetails.getUser();
+		
+		String token = jwtService.generateToken(user.getUsername());
 		 
 		 UserResponse response = new UserResponse();
 		 String msg = responseCode.getMessageByCode(ResponseCode.LOGIN_SUCCESS, operation);
 		 response.setIsSuccess(true);
 		 response.setMessage(msg);
 		 response.setStatus("Success");
+		 response.setAccessToken(token);
 		 response.setUsername(user.getUsername());
 		 response.setRole(user.getRole().name());
 		return response;
