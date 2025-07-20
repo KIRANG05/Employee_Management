@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,7 @@ public class EmployeeController {
 	private EmployeeService employeeService;
 	
 	
-	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/add")
 	public ResponseEntity<EmployeeResponse> saveEmployee(@RequestBody Employee employee, HttpServletRequest request) {
 		
@@ -51,6 +52,7 @@ public class EmployeeController {
 
 	}
 		
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/add/Bulk")
 	public ResponseEntity<EmployeeResponse> saveEmployees(@RequestBody List<Employee> employees, HttpServletRequest request) {
 		String operation = request.getRequestURI();
@@ -67,6 +69,7 @@ public class EmployeeController {
 		
 	}
 	
+	@PreAuthorize("hasAnyRole('ADMIN','HR','EMPLOYEE')")
 	@GetMapping("/employeeDetails")
 	public ResponseEntity<EmployeeResponse> getAllEmployees(HttpServletRequest request) {
 		
@@ -83,6 +86,7 @@ public class EmployeeController {
 		}
 	}
 	
+	@PreAuthorize("hasAnyRole('ADMIN','HR','EMPLOYEE')")
 	@GetMapping("/employeeDetails/{id}")
 	public ResponseEntity<EmployeeResponse> getEmployeeById(@PathVariable Long id, HttpServletRequest request) {
 		
@@ -99,6 +103,7 @@ public class EmployeeController {
 		}
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/employeeUpdateById/{id}")
 	public ResponseEntity<GenericResponse> updateEmployee(@RequestBody Employee employee, @PathVariable Long id, HttpServletRequest request) {
 		
@@ -115,6 +120,7 @@ public class EmployeeController {
 		}
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping("/employeeUpdateById/{id}") 
 	public ResponseEntity<GenericResponse> partialUpdate(@RequestBody Employee employee, @PathVariable Long id, HttpServletRequest request) {
 		
@@ -131,6 +137,7 @@ public class EmployeeController {
 		}
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/deleteById/{id}")
 	public ResponseEntity<GenericResponse> employeeDelete(@PathVariable Long id, HttpServletRequest request) {
 		
