@@ -24,10 +24,13 @@ import com.Practice.Employee.Management.ResponseModal.EmployeeResponse;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.EmployeeService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/employee")
+@SecurityRequirement(name = "BearerAuth")
 public class EmployeeController {
 	
 	@Autowired
@@ -36,6 +39,10 @@ public class EmployeeController {
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/add")
+	 @Operation(
+		        summary = "Add a New Employee",
+		        description = "Creates a new employee in the system. Only accessible by users with ADMIN role."
+		    )
 	public ResponseEntity<EmployeeResponse> saveEmployee(@RequestBody Employee employee, HttpServletRequest request) {
 		
 		String operation = request.getRequestURI();
@@ -54,6 +61,10 @@ public class EmployeeController {
 		
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/add/Bulk")
+	 @Operation(
+		        summary = "Add Multiple Employees",
+		        description = "Adds multiple employees in a single request. Only accessible by users with ADMIN role."
+		    )
 	public ResponseEntity<EmployeeResponse> saveEmployees(@RequestBody List<Employee> employees, HttpServletRequest request) {
 		String operation = request.getRequestURI();
 		EmployeeResponse response = employeeService.saveAll(employees, operation);
@@ -71,6 +82,10 @@ public class EmployeeController {
 	
 	@PreAuthorize("hasAnyRole('ADMIN','HR','EMPLOYEE')")
 	@GetMapping("/employeeDetails")
+	@Operation(
+	        summary = "Get All Employees",
+	        description = "Fetches the list of all employees. Accessible by ADMIN, HR, and EMPLOYEE roles."
+	    )
 	public ResponseEntity<EmployeeResponse> getAllEmployees(HttpServletRequest request) {
 		
 		String operation = request.getRequestURI();
@@ -88,6 +103,10 @@ public class EmployeeController {
 	
 	@PreAuthorize("hasAnyRole('ADMIN','HR','EMPLOYEE')")
 	@GetMapping("/employeeDetails/{id}")
+	@Operation(
+	        summary = "Get Employee By ID",
+	        description = "Fetches employee details using the employee ID. Accessible by ADMIN, HR, and EMPLOYEE roles."
+	    )
 	public ResponseEntity<EmployeeResponse> getEmployeeById(@PathVariable Long id, HttpServletRequest request) {
 		
 		String operation = request.getRequestURI();
@@ -105,6 +124,10 @@ public class EmployeeController {
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/employeeUpdateById/{id}")
+	@Operation(
+	        summary = "Update Employee By ID (Full Update)",
+	        description = "Updates all employee fields by employee ID. Only accessible by ADMIN."
+	    )
 	public ResponseEntity<GenericResponse> updateEmployee(@RequestBody Employee employee, @PathVariable Long id, HttpServletRequest request) {
 		
 		String operation = request.getRequestURI();
@@ -121,7 +144,11 @@ public class EmployeeController {
 	}
 	
 	@PreAuthorize("hasRole('ADMIN')")
-	@PatchMapping("/employeeUpdateById/{id}") 
+	@PatchMapping("/employeeUpdateById/{id}")
+	 @Operation(
+		        summary = "Partially Update Employee By ID",
+		        description = "Partially updates employee fields by ID. Only accessible by ADMIN."
+		    )
 	public ResponseEntity<GenericResponse> partialUpdate(@RequestBody Employee employee, @PathVariable Long id, HttpServletRequest request) {
 		
 		String operation = request.getRequestURI();
@@ -139,6 +166,10 @@ public class EmployeeController {
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/deleteById/{id}")
+	@Operation(
+	        summary = "Delete Employee By ID",
+	        description = "Deletes the employee with the specified ID from the system. Only accessible by ADMIN."
+	    )
 	public ResponseEntity<GenericResponse> employeeDelete(@PathVariable Long id, HttpServletRequest request) {
 		
 		String operation = request.getRequestURI();

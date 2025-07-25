@@ -14,6 +14,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -25,9 +26,13 @@ public class GlobalExceptionHandler {
 	}
 	 
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<GenericResponse> handleAll(Exception ex) {
+	public ResponseEntity<GenericResponse> handleAll(Exception ex, HttpServletRequest request) throws Exception {
 		ex.printStackTrace();
 		
+		String path = request.getRequestURI();
+		 if (path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui") || path.startsWith("/swagger-resources") || path.startsWith("/webjars")) {
+		        throw ex; // Let Springdoc handle it
+		    }
 		GenericResponse response = new GenericResponse(false, "Error", "Something went wrong");
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	}

@@ -39,7 +39,13 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/register", "/auth/login").permitAll()
+				.authorizeHttpRequests(auth -> auth.requestMatchers(
+						"/auth/register",
+						"/auth/login", 
+						"/swagger-ui/**",
+						"/swagger-ui.html",
+						 "/v3/api-docs/**"
+						).permitAll()
 						.anyRequest()
 						.authenticated())
 //						.httpBasic(withDefaults()) // This is for Basic Auth
