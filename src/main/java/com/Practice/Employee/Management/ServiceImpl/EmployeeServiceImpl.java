@@ -33,7 +33,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public EmployeeResponse save(Employee employee, String operation) {
 		logger.info("Save Operation Initiated For Employee: {}", employee);
 		
-		EmployeeResponse response = new EmployeeResponse();
+		EmployeeResponse response = new EmployeeResponse();	
 		Employee result = employeeRepository.save(employee);
 
 		if (result != null) {
@@ -113,7 +113,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		logger.info("FindById Operation Initiated For ID: {}", id);
 		
 		EmployeeResponse response = new EmployeeResponse();
-		Optional<Employee> result = employeeRepository.findById(id);
+		Optional<Employee> result = employeeRepository.findById(id);//To Avoid Null pointer exception we use optional here means based on id the data may be present or may not be it store both (null or non null object)
 		
 		if (result.isPresent()) {
 			Employee employee = result.get();
