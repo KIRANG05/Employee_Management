@@ -20,6 +20,7 @@ import com.Practice.Employee.Management.ResponseModal.UserResponse;
 import com.Practice.Employee.Management.Service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
@@ -32,7 +33,7 @@ public class AuthController {
 	
 	
 	@PostMapping("/register")
-	public ResponseEntity<UserResponse> register(@RequestBody Users user, HttpServletRequest request) {
+	public ResponseEntity<UserResponse> register(@Valid @RequestBody Users user, HttpServletRequest request) {
 		String operation = request.getRequestURI();
 		
 		UserResponse response = authService.registerUser(user, operation);
