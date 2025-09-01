@@ -26,7 +26,7 @@ public class Users {
 	private String username;
 	@Column(nullable = false)
 	@NotEmpty(message = "* It is Required")
-	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).{8,}$\"", message = "* Enter minimum 8 charecter, one uppercase, one lowercase, one number and one special charecter")
+	@Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).{8,}$", message = "* Enter minimum 8 charecter, one uppercase, one lowercase, one number and one special charecter")
 	private String password;
 	@Enumerated(EnumType.STRING)
 	@NotNull(message = "* It is Required")
