@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Practice.Employee.Management.Modal.AuthRequest;
+import com.Practice.Employee.Management.Modal.TokenRefreshRequest;
 import com.Practice.Employee.Management.Modal.Users;
+import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.ResponseModal.UserResponse;
 import com.Practice.Employee.Management.Service.AuthService;
 
@@ -70,5 +72,41 @@ public class AuthController {
 		
 		
 	}
+	
+	 @PostMapping("/refresh")
+	 public ResponseEntity<UserResponse> refresh(@RequestBody TokenRefreshRequest tokenRequest, HttpServletRequest request) {
+		 
+		 String operation = request.getRequestURI();
+		 UserResponse response = authService.refreshAccessToken(tokenRequest.getRefreshToken(), operation);
+		 
+		 if (response.getIsSuccess()) {
+			 return ResponseEntity
+					 .status(HttpStatus.OK)
+					 .body(response);
+		 } else {
+			 return ResponseEntity
+					 .status(HttpStatus.BAD_REQUEST)
+					 .body(response);
+		 }
+		 
+	        
+	    }
+
+	    @PostMapping("/logout")
+	    public ResponseEntity<GenericResponse> logout(@RequestBody TokenRefreshRequest logoutRequest, HttpServletRequest request) {
+	    	
+	    	String operation = request.getRequestURI();
+	        GenericResponse response  = authService.logout(logoutRequest.getRefreshToken(), operation);
+	       
+	        if (response.getIsSuccess()) {
+	        	return ResponseEntity
+	        			.status(HttpStatus.OK)
+	        			.body(response);
+	        } else {
+	        	return ResponseEntity
+	        			.status(HttpStatus.BAD_REQUEST)
+	        			.body(response);
+	        }
+	    }
 
 }

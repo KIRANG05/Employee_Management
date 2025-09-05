@@ -23,6 +23,9 @@
 			@Value("${jwt.expiration}")
 			private Long expiration;
 			
+			@Value("${jwt.refreshTokenExpiration}")
+			private Long refreshExpiration;
+			
 			private Key secretKey;
 			
 			@PostConstruct
@@ -43,6 +46,15 @@
 				
 			}
 
+			
+			 public String generateRefreshToken(String username) {
+			        return Jwts.builder()
+			                .setSubject(username)
+			                .setIssuedAt(new Date())
+			                .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
+			                .signWith(secretKey, SignatureAlgorithm.HS256)
+			                .compact();
+			    }
 
 
 			public String extractUserName(String token) {
