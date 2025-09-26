@@ -131,11 +131,14 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public GenericResponse logout(String refreshToken, String operation) {
 		
-		RefreshToken tokenEntity = refreshTokenRepository.findByTokenAndIsDeletedFalse(refreshToken)
-	            .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+		 Optional<RefreshToken> tokenOpt = refreshTokenRepository.findByTokenAndIsDeletedFalse(refreshToken);
 
-	        tokenEntity.setIsDeleted(true); // soft delete
-	        refreshTokenRepository.save(tokenEntity);
+		    if (tokenOpt.isPresent()) {
+		        RefreshToken token = tokenOpt.get();
+		        token.setIsDeleted(true);
+		        refreshTokenRepository.save(token);
+		    }
+
 		
 		GenericResponse response = new GenericResponse();
 		String msg = responseCode.getMessageByCode(ResponseCode.LOGOUT_SUCCESS, operation);
