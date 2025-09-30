@@ -1,5 +1,9 @@
 package com.Practice.Employee.Management.ResponseModal;
 
+import java.util.List;
+
+import com.Practice.Employee.Management.Modal.Users;
+
 public class UserResponse extends GenericResponse {
 
 	private String username;
@@ -7,6 +11,7 @@ public class UserResponse extends GenericResponse {
 	private String accessToken;
 	private String refreshToken;
 	private String tokenType = "Bearer";
+	
 
 	public UserResponse() {
 	}

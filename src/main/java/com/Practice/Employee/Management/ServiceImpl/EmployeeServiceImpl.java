@@ -67,7 +67,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			response.setStatus("Success");
 			response.setIsSuccess(true);
 			response.setMessage(msg);
-			response.setEmployees(employees);
+			response.setEmployees(result);
 			
 			logger.info("Batch Save Successful — Saved {} Employees. Operation: {}", result.size(), operation);
 		} else {

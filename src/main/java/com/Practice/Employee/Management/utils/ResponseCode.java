@@ -16,5 +16,7 @@ public class ResponseCode {
 	public static final String LOGIN_SUCCESS = "A005";
 	public static final String NEW_ACCESS_TOKEN_GENERATE_SUCCESS = "A006";
 	public static final String LOGOUT_SUCCESS = "A007";
+	public static final String TASK_ADDED_SUCCESS = "A008";
+	public static final String TASK_ADDED_FAILED = "E006";
 
 }

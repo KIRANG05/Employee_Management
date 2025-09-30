@@ -2,11 +2,18 @@ package com.Practice.Employee.Management.Modal;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "task_details")
@@ -15,12 +22,23 @@ public class Task {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@Column(nullable = false)
+	@NotEmpty(message = "* Task Name Required")
+	@Size(max = 100, message = "Task name must be less than 100 characters")
 	private String taskName;
+	@Size(max = 500, message ="Description cannot exceed 500 characters")
 	private String description;
+	@Column(nullable = false)
 	private String assignedBy;
+	@Column(nullable = false)
+	@NotEmpty(message = "* AssignedTo is Required")
 	private String assignedTo;
-	private String status;
-	private LocalDate assignedDate;
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private TaskStatus status = TaskStatus.PENDING ;
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private LocalDate assignedDate = LocalDate.now();
+	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate dueDate;
 
 	/* if we define parameterized contsructor java dy defautl will not provide no argument
@@ -29,15 +47,15 @@ public class Task {
 
 	}
 
-	public  Task(Long id, String taskName, String description,String assignedBy, String assignedTo, String status,  LocalDate assignedDate, LocalDate dueDate  ) {
+	public  Task(Long id, String taskName, String description,String assignedBy, String assignedTo, TaskStatus status,  LocalDate assignedDate, LocalDate dueDate  ) {
 
 		this.id = id;
 		this.taskName = taskName;
 		this.description = description;
 		this.assignedBy = assignedBy;
 		this.assignedTo = assignedTo;
-		this.status = status;
-		this.assignedDate = assignedDate;
+		this.status = (status != null) ? status : TaskStatus.PENDING;
+		this.assignedDate = LocalDate.now();
 		this.dueDate = dueDate;
 	}
 
@@ -81,11 +99,11 @@ public class Task {
 		this.assignedTo = assignedTo;
 	}
 
-	public String getStatus() {
+	public TaskStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(TaskStatus status) {
 		this.status = status;
 	}
 
