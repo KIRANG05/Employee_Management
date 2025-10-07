@@ -76,7 +76,7 @@ public class TaskController {
 													@RequestParam(required = false) String assignedTo, HttpServletRequest request) {
 		String operation = request.getRequestURI();
 		TaskResponse response = taskService.filterTasks(fromDateStr, toDateStr, assignedBy, assignedTo, operation);
-		if(response != null) {
+		if(response.getIsSuccess()) {
 			return ResponseEntity
 					.status(HttpStatus.OK)
 					.body(response);

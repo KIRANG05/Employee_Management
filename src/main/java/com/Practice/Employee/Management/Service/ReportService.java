@@ -1,0 +1,9 @@
+package com.Practice.Employee.Management.Service;
+
+import com.Practice.Employee.Management.ResponseModal.ReportResponse;
+
+public interface ReportService {
+
+	ReportResponse getTaskSummary(String operation);
+
+}
