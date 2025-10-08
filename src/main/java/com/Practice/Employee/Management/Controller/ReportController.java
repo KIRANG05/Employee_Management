@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Practice.Employee.Management.ResponseModal.ReportResponse;
@@ -39,6 +40,26 @@ public class ReportController {
 			return ResponseEntity
 			.status(HttpStatus.NOT_FOUND)
 			.body(response);
+		}
+		
+	}
+	
+	@PreAuthorize("hasAnyRole('HR', 'ADMIN')")
+	@GetMapping("/taskSummaryByEmployee")
+	public ResponseEntity<ReportResponse> getTaskSummaryByEmployee(@RequestParam String employeeName, HttpServletRequest requset){
+		
+		String operation = requset.getRequestURI();
+		ReportResponse response = reportService.getTaskSummaryByEmployee(employeeName, operation);
+		
+		if(response.getIsSuccess()) {
+			return ResponseEntity
+					.status(HttpStatus.OK)
+					.body(response);
+			
+		}else {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(response);
 		}
 		
 	}

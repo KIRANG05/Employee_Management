@@ -54,4 +54,30 @@ public class ReportServiceImpl implements ReportService {
 		return response;
 	}
 
+	@Override
+	public ReportResponse getTaskSummaryByEmployee(String employeeName, String operation) {
+		ReportResponse response = new ReportResponse();
+		Long totalTasks = taskRepository.countByAssignedTo(employeeName);
+		Long completedtasks = taskRepository.countByAssignedToAndStatus(employeeName, TaskStatus.COMPLETED);
+		Long pendingTasks = taskRepository.countByAssignedToAndStatus(employeeName, TaskStatus.PENDING);
+		Long overDueTasks = taskRepository.countOverdueByEmployee(employeeName,LocalDate.now(), TaskStatus.COMPLETED);
+		
+		try {
+			String msg = responseCodeRepository.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+			response.setIsSuccess(true);
+			response.setMessage(msg);
+			response.setStatus("Success");
+			response.setTotalTasks(totalTasks);
+			response.setCompletedTasks(completedtasks);
+			response.setPendingTasks(pendingTasks);
+			response.setOverDueTasks(overDueTasks);
+		} catch (Exception e) {
+			response.setIsSuccess(false);
+			response.setMessage(responseCodeRepository.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation));
+			response.setStatus("Failed");
+		}
+		
+		return response;
+	}
+
 }

@@ -6,4 +6,6 @@ public interface ReportService {
 
 	ReportResponse getTaskSummary(String operation);
 
+	ReportResponse getTaskSummaryByEmployee(String employeeName, String operation);
+
 }
