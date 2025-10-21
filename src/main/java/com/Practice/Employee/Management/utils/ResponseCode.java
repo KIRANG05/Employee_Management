@@ -18,5 +18,7 @@ public class ResponseCode {
 	public static final String LOGOUT_SUCCESS = "A007";
 	public static final String TASK_ADDED_SUCCESS = "A008";
 	public static final String TASK_ADDED_FAILED = "E006";
+	public static final String ROLE_UPDATE_SUCCESS = "A009";
+	public static final String ROLE_UPDATE_FAILED = "E007";
 
 }

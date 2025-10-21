@@ -6,6 +6,7 @@ import com.Practice.Employee.Management.Modal.Users;
 
 public class UserResponse extends GenericResponse {
 
+	private Long id;
 	private String username;
 	private String role;
 	private String accessToken;
@@ -16,14 +17,23 @@ public class UserResponse extends GenericResponse {
 	public UserResponse() {
 	}
 
-	public UserResponse(String username, String role, String accessToken, String refreshToken, String tokenType) {
+	public UserResponse(Long id, String username, String role, String accessToken, String refreshToken, String tokenType) {
 
+		this.id = id;
 		this.username = username;
 		this.role = role;
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
         this.tokenType = "Bearer";
 
+	}
+	
+	public Long getId() {
+		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getAccessToken() {
@@ -70,7 +80,7 @@ public class UserResponse extends GenericResponse {
 
 	@Override
 	public String toString() {
-		return "UserResponse [username=" + username + ", role=" + role + ", accessToken=" + accessToken
+		return "UserResponse [id=" + id + ", username=" + username + ", role=" + role + ", accessToken=" + accessToken
 				+ ", refreshToken=" + refreshToken + ", tokenType=" + tokenType + "]";
 	}
 
