@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.Practice.Employee.Management.Modal.ChangePasswordRequest;
 import com.Practice.Employee.Management.Modal.Role;
 import com.Practice.Employee.Management.Modal.Users;
 import com.Practice.Employee.Management.Repository.ResponseCodeRespository;
@@ -24,8 +26,11 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private ResponseCodeRespository responseCode;
 	
-	public UserServiceImpl(UserRepository userRepository) {
+	private final PasswordEncoder passwordEncoder;
+	
+	public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override
@@ -77,6 +82,39 @@ public class UserServiceImpl implements UserService {
 			response.setIsSuccess(false);
 			response.setMessage(msg);
 			response.setStatus("Failed");
+		}
+		
+		return response;
+	}
+
+	@Override
+	public GenericResponse changePassword(ChangePasswordRequest passwordRequest, String username, String operation) {
+	
+		GenericResponse response = new GenericResponse();
+		Optional<Users> result = userRepository.findByUsername(username);
+		
+		if(!result.isEmpty() || result != null) {
+			
+			Users user = result.get();
+			if(!passwordEncoder.matches(passwordRequest.getOldPassword(), user.getPassword())) {
+				
+				response.setIsSuccess(false);
+		        response.setStatus("Failed");
+		        response.setMessage("Old password is incorrect");
+			}
+			
+			user.setPassword(passwordEncoder.encode(passwordRequest.getNewPassword()));
+			userRepository.save(user);
+			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+			response.setIsSuccess(true);
+	        response.setStatus("Success");
+	        response.setMessage(msg);
+			
+		} else {
+			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
+			response.setIsSuccess(false);
+	        response.setStatus("Failed");
+	        response.setMessage(msg);
 		}
 		
 		return response;
