@@ -21,7 +21,17 @@ public class Employee {
 	private String company;
 	@Column(name = "Employee_Salary")
 	private Double salary;
+	@Column(name = "Profile_Image")
+	private String profileImage;
 	
+	public String getProfileImage() {
+		return profileImage;
+	}
+
+	public void setProfileImage(String profileImage) {
+		this.profileImage = profileImage;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -58,7 +68,8 @@ public class Employee {
 
 	@Override
 	public String toString() {
-		return "Employee [id=" + id + ", name=" + name + ", company=" + company + ", salary=" + salary + "]";
+		return "Employee [id=" + id + ", name=" + name + ", company=" + company + ", salary=" + salary
+				+ ", profileImage=" + profileImage + "]";
 	}
 	
 	

@@ -1,12 +1,19 @@
 package com.Practice.Employee.Management.ServiceImpl;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.Practice.Employee.Management.Modal.Employee;
 import com.Practice.Employee.Management.Repository.EmployeeRepository;
@@ -27,13 +34,25 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Autowired
 	private ResponseCodeRespository responseCode;
 	
+	@Value("${employee.images.path}")
+	private String imageUploadPath;
+	
 	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 	
 	@Override
-	public EmployeeResponse save(Employee employee, String operation) {
+	public EmployeeResponse save(Employee employee,MultipartFile image, String operation) {
 		logger.info("Save Operation Initiated For Employee: {}", employee);
 		
 		EmployeeResponse response = new EmployeeResponse();	
+		
+		try {
+		if(image != null && !image.isEmpty()) {
+			String fileName = UUID.randomUUID().toString() +"_"+ image.getOriginalFilename();
+			Path filePath = Paths.get(imageUploadPath, fileName);
+			Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+			employee.setProfileImage(fileName);
+		}
+		
 		Employee result = employeeRepository.save(employee);
 
 		if (result != null) {
@@ -51,6 +70,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 			response.setStatus("Failed");
 			
 			logger.error("Failed To Save Employee — Repository Did Not Return Entity. Name: {}", employee.getName());
+		}
+		}catch (Exception e) {
+			 logger.error("Error while saving employee image: ", e);
+		        response.setIsSuccess(false);
+		        response.setMessage("Failed to upload image");
+		        response.setStatus("Error");
 		}
 		return response;
 	}

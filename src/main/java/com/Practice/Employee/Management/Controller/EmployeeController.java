@@ -16,13 +16,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.Practice.Employee.Management.Modal.Employee;
 import com.Practice.Employee.Management.Repository.EmployeeRepository;
 import com.Practice.Employee.Management.ResponseModal.EmployeeResponse;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.EmployeeService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper; 
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -38,15 +43,18 @@ public class EmployeeController {
 	
 	
 	@PreAuthorize("hasRole('ADMIN')")
-	@PostMapping("/add")
+	@PostMapping(value = "/add", consumes = { "multipart/form-data" })
 	 @Operation(
 		        summary = "Add a New Employee",
 		        description = "Creates a new employee in the system. Only accessible by users with ADMIN role."
 		    )
-	public ResponseEntity<EmployeeResponse> saveEmployee(@RequestBody Employee employee, HttpServletRequest request) {
+	public ResponseEntity<EmployeeResponse> saveEmployee(@RequestPart("employee") String employeeJson, @RequestPart(value = "image", required = false) MultipartFile image, HttpServletRequest request) throws JsonMappingException, JsonProcessingException {
 		
 		String operation = request.getRequestURI();
-		EmployeeResponse response = employeeService.save(employee, operation);
+		
+		ObjectMapper mapper = new ObjectMapper();
+		Employee employee = mapper.readValue(employeeJson, Employee.class);
+		EmployeeResponse response = employeeService.save(employee, image,  operation);
 		if (response.getIsSuccess()) {
 			return ResponseEntity
 					.status(HttpStatus.CREATED)
