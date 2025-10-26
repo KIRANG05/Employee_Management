@@ -1,5 +1,6 @@
 package com.Practice.Employee.Management.ServiceImpl;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,12 +13,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.Practice.Employee.Management.Modal.Employee;
+import com.Practice.Employee.Management.Modal.Role;
+import com.Practice.Employee.Management.Modal.Users;
 import com.Practice.Employee.Management.Repository.EmployeeRepository;
 import com.Practice.Employee.Management.Repository.ResponseCodeRespository;
+import com.Practice.Employee.Management.Repository.UserRepository;
 import com.Practice.Employee.Management.ResponseModal.EmployeeResponse;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.EmployeeService;
@@ -30,9 +35,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 	
 	@Autowired
 	private EmployeeRepository employeeRepository;
+	
 
 	@Autowired
 	private ResponseCodeRespository responseCode;
+	
+	private UserRepository userRepository;
+	
+	private final PasswordEncoder passwordEncoder;
+	
+	public EmployeeServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+		this.userRepository = userRepository;
+		this.passwordEncoder = passwordEncoder;
+	}
 	
 	@Value("${employee.images.path}")
 	private String imageUploadPath;
@@ -52,6 +67,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 			Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 			employee.setProfileImage(fileName);
 		}
+		
+		Users user = new Users();
+		user.setUsername(employee.getName().toLowerCase().replace(" ", "."));
+		user.setPassword(passwordEncoder.encode("default123")); // default password
+		user.setRole(Role.ROLE_EMPLOYEE); // default role
+		userRepository.save(user);
+		
+		employee.setUser(user);
+
 		
 		Employee result = employeeRepository.save(employee);
 
@@ -114,6 +138,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 		List<Employee> result = employeeRepository.findAll();
 
 		if (result != null) {
+			
+			  result.forEach(emp -> {
+		            if (emp.getUser() != null) {
+		                emp.setRole(emp.getUser().getRole()); // Assuming Employee has a 'role' field (transient or not persisted)
+		            }
+		        });
 			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
 			response.setStatus("Success");
 			response.setIsSuccess(true);
@@ -162,15 +192,40 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}		
 
 	@Override
-	public GenericResponse updateById(Employee employee, Long id, String operation) {
+	public GenericResponse updateById(Employee employee, MultipartFile image,  Long id, String operation) {
 		logger.info("Update Operation Initiated For ID: {}", id);
 		
 		GenericResponse response = new GenericResponse();
 		Optional<Employee> result = employeeRepository.findById(id);
 
 		if (result.isPresent()) {
+			
+			Employee existingEmployee = result.get();
+			existingEmployee.setName(employee.getName());
+			existingEmployee.setCompany(employee.getCompany());
+			existingEmployee.setSalary(employee.getSalary());
+			
+			
+			if(!image.isEmpty() && image != null) {
+				try {
+	                String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
+	                
+	                // Make sure this matches your property: employee.images.path=D:/Employee_Images/
+	                Path imagePath = Paths.get(imageUploadPath + fileName);
+	                
+	                Files.copy(image.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
+	                existingEmployee.setProfileImage(fileName);
+	                
+	                logger.info("New profile image uploaded for Employee ID: {}", id);
+			} catch (IOException e) {
+                logger.error("Error while saving image: {}", e.getMessage());
+                response.setIsSuccess(false);
+                response.setStatus("Failed");
+                response.setMessage("Error saving image: " + e.getMessage());
+			}
+			}
 
-			employeeRepository.save(employee);
+			employeeRepository.save(existingEmployee);
 			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_UPDATE_SUCCESS, operation);
 			response.setMessage(msg);
 			response.setIsSuccess(true);

@@ -18,7 +18,7 @@ public interface EmployeeService {
 
 	EmployeeResponse findById(Long id, String operation);
 
-	GenericResponse updateById(Employee employee, Long id, String operation);
+	GenericResponse updateById(Employee employee, MultipartFile image, Long id, String operation);
 
 	GenericResponse partialUpdateById(Employee employee, Long id, String operation);
 

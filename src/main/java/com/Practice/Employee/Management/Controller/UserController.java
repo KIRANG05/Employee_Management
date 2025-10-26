@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,10 +76,23 @@ public class UserController {
 	
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/updateRole/{id}")
-	public ResponseEntity<GenericResponse> updateRole(@PathVariable Long id, @RequestParam Role newRole, HttpServletRequest request) {
+	public ResponseEntity<GenericResponse> updateRole(@PathVariable Long id, @RequestParam String newRole, HttpServletRequest request) {
 		
 		String operation = request.getRequestURI();
-		GenericResponse response = userService.updateRole(operation, id, newRole);
+		
+		Role roleEnum;
+		
+		 try {
+		        roleEnum = Role.fromString(newRole); // convert manually using your JsonCreator method
+		    } catch (IllegalArgumentException e) {
+		        GenericResponse response = new GenericResponse();
+		        response.setIsSuccess(false);
+		        response.setStatus("Failed");
+		        response.setMessage("Invalid role: " + newRole);
+		        return ResponseEntity.badRequest().body(response);
+		    }
+		
+		GenericResponse response = userService.updateRole(operation, id, roleEnum);
 		
 		if(response.getIsSuccess()) {
 			return ResponseEntity
@@ -93,7 +107,7 @@ public class UserController {
 	}
 	
 	@PreAuthorize("isAuthenticated()")
-	@PutMapping("/changePassword")
+	@PostMapping("/changePassword")
 	public ResponseEntity<GenericResponse> changePassword(@RequestBody ChangePasswordRequest passwordRequest,Principal principal,  HttpServletRequest request){
 		
 		String operation = request.getRequestURI();

@@ -1,5 +1,8 @@
 package com.Practice.Employee.Management.Modal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -31,6 +35,20 @@ public class Users {
 	@Enumerated(EnumType.STRING)
 	@NotNull(message = "* It is Required")
 	private Role role;
+
+	@OneToOne(mappedBy = "user")
+	@JsonIgnore
+	private Employee employee;
+
+	
+	
+	public Employee getEmployee() {
+		return employee;
+	}
+
+	public void setEmployee(Employee employee) {
+		this.employee = employee;
+	}
 
 	public Long getId() {
 		return id;
@@ -66,7 +84,8 @@ public class Users {
 
 	@Override
 	public String toString() {
-		return "Users [id=" + id + ", username=" + username + ", password=" + password + ", role=" + role + "]";
+		return "Users [id=" + id + ", username=" + username + ", password=" + password + ", role=" + role
+				+ ", employee=" + employee + "]";
 	}
 
 }

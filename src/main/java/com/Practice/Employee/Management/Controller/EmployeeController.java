@@ -136,10 +136,13 @@ public class EmployeeController {
 	        summary = "Update Employee By ID (Full Update)",
 	        description = "Updates all employee fields by employee ID. Only accessible by ADMIN."
 	    )
-	public ResponseEntity<GenericResponse> updateEmployee(@RequestBody Employee employee, @PathVariable Long id, HttpServletRequest request) {
+	public ResponseEntity<GenericResponse> updateEmployee(@RequestPart("employee") String employeeJson, @RequestPart(value = "image", required = false) MultipartFile image, @PathVariable Long id, HttpServletRequest request) throws JsonMappingException, JsonProcessingException {
 		
 		String operation = request.getRequestURI();
-		GenericResponse response =  employeeService.updateById(employee, id, operation);
+		ObjectMapper mapper = new ObjectMapper();
+		Employee employee = mapper.readValue(employeeJson, Employee.class);
+		
+		GenericResponse response =  employeeService.updateById(employee, image, id, operation);
 		if (response.getIsSuccess()) {
 			return ResponseEntity
 					.status(HttpStatus.OK)

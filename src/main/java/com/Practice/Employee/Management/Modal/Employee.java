@@ -1,11 +1,18 @@
 package com.Practice.Employee.Management.Modal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 
 @Entity
@@ -24,6 +31,31 @@ public class Employee {
 	@Column(name = "Profile_Image")
 	private String profileImage;
 	
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "user_id", referencedColumnName = "id")
+	@JsonIgnore
+	private Users user;
+	
+	@Transient
+	private Role role;
+
+	
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
+
+	public Users getUser() {
+		return user;
+	}
+
+	public void setUser(Users user) {
+		this.user = user;
+	}
+
 	public String getProfileImage() {
 		return profileImage;
 	}
@@ -69,7 +101,7 @@ public class Employee {
 	@Override
 	public String toString() {
 		return "Employee [id=" + id + ", name=" + name + ", company=" + company + ", salary=" + salary
-				+ ", profileImage=" + profileImage + "]";
+				+ ", profileImage=" + profileImage + ", user=" + user + "]";
 	}
 	
 	
