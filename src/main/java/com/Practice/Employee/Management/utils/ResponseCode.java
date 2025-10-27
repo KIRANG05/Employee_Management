@@ -20,5 +20,7 @@ public class ResponseCode {
 	public static final String TASK_ADDED_FAILED = "E006";
 	public static final String ROLE_UPDATE_SUCCESS = "A009";
 	public static final String ROLE_UPDATE_FAILED = "E007";
+	public static final String LEAVE_APPLIED_SUCCESS = "A010";
+	public static final String LEAVE_APPLIED_FAILED = "E008";
 
 }
