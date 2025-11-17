@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import com.Practice.Employee.Management.Modal.LeaveRequest;
 import com.Practice.Employee.Management.Modal.LeaveStatus;
 
-public class LeaveResponse extends GenericResponse {
+public class LeaveResponse {
 	
 	 	private Long id;
 	    private String employeeName;
