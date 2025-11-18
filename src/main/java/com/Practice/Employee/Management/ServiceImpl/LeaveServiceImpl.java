@@ -131,7 +131,7 @@ public class LeaveServiceImpl implements LeaveService {
 			List<LeaveResponse> leaves = leaveRequests.stream().map(leave -> {
 				LeaveResponse leaveResponse = new LeaveResponse();
 				
-				leaveResponse.setId(leave.getId());
+				leaveResponse.setId(leave.getEmployee().getId());
 				leaveResponse.setEmployeeName(leave.getEmployee().getUsername());
 				leaveResponse.setFromDate(leave.getFromDate());
 				leaveResponse.setToDate(leave.getToDate());
