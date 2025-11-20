@@ -1,13 +1,16 @@
 package com.Practice.Employee.Management.Controller;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Practice.Employee.Management.ResponseModal.AttendenceResponse;
@@ -63,5 +66,46 @@ public class AttendenceController {
 		}
 		
 	}
+	
+	@GetMapping("/myAttendence")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<GenericResponse<List<AttendenceResponse>>> myAttendence(@RequestParam int year, @RequestParam int month, Principal principal, HttpServletRequest request){
+		
+		String operation = request.getRequestURI();
+		
+		GenericResponse<List<AttendenceResponse>> response = attendenceService.myAttendence(principal.getName(), year, month,  operation);
+		
+		if(response.getIsSuccess()) {
+			return ResponseEntity
+					.status(HttpStatus.OK)
+					.body(response);
+		} else {
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(response);
+		}
+		
+	}
+	
+	@GetMapping("/admin/fetchAll")
+	@PreAuthorize("hasAnyRole('ADMIN', 'HR')")
+	public ResponseEntity<GenericResponse<List<AttendenceResponse>>> adminAttendence(@RequestParam int year, @RequestParam int month, @RequestParam Long employeeId, HttpServletRequest request){
+		
+		String operation = request.getRequestURI();
+		
+		GenericResponse<List<AttendenceResponse>> response = attendenceService.adminAttendence(employeeId, year, month,  operation);
+		
+		if(response.getIsSuccess()) {
+			return ResponseEntity
+					.status(HttpStatus.OK)
+					.body(response);
+		} else {
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(response);
+		}
+		
+	}
+	
 	
 }

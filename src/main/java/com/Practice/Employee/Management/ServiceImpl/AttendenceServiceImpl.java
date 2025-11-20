@@ -3,6 +3,8 @@ package com.Practice.Employee.Management.ServiceImpl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -101,13 +103,13 @@ public class AttendenceServiceImpl implements AttendenceService {
 		        return response;
 		    }
 		 
-//		 if (attendence.getLogoutTime() != null) {
-//		        response.setIsSuccess(false);
-//		        response.setStatus("Failed");
-//		        response.setMessage("Already punched out today");
-//		        response.setData(null);
-//		        return response;
-//		    }
+		 if (attendence.getLogoutTime() != null) {
+		        response.setIsSuccess(false);
+		        response.setStatus("Failed");
+		        response.setMessage("Already punched out today");
+		        response.setData(null);
+		        return response;
+		    }
 		 
 		  attendence.setLogoutTime(LocalDateTime.now());
 		
@@ -127,6 +129,75 @@ public class AttendenceServiceImpl implements AttendenceService {
 		response.setMessage(msg);
 		response.setData(attendenceResponse);
 		
+		
+		return response;
+	}
+
+	@Override
+	public GenericResponse<List<AttendenceResponse>> myAttendence(String username, int year, int month, String operation) {
+		
+		
+		GenericResponse<List<AttendenceResponse>> response = new GenericResponse<>();
+		List<AttendenceResponse> attendenceResponse = new ArrayList<>();
+		
+		Users user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new RuntimeException("User Not Found"));
+		
+		List<Attendence> records = attendenceRepository
+	            .findAllByEmployeeMonth(user.getId(), year, month);
+		
+		for (Attendence attendence : records) {
+			  AttendenceResponse resp = new AttendenceResponse();
+			  resp.setId(attendence.getId());
+			  resp.setDate(attendence.getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+			  resp.setLoginTime(attendence.getLoginTime() != null ? attendence.getLoginTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) : null);
+			 resp.setLogoutTime(attendence.getLogoutTime() != null ? attendence.getLogoutTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) : null);
+			 resp.setStatus(attendence.getLoginTime() != null ? "P" : "A");
+			 
+			 attendenceResponse.add(resp);
+		}
+		
+		   String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+		    response.setIsSuccess(true);
+		    response.setStatus("Success");
+		    response.setMessage(msg);
+		    response.setData(attendenceResponse);
+		
+		return response;
+	}
+
+	@Override
+	public GenericResponse<List<AttendenceResponse>> adminAttendence(Long employeeId, int year, int month,
+			String operation) {
+		
+		GenericResponse<List<AttendenceResponse>> response = new GenericResponse<>();
+		List<AttendenceResponse> attendenceResponse = new ArrayList<>();
+		
+		List<Attendence> records = attendenceRepository
+	            .findAllByEmployeeMonth(employeeId, year, month);
+		
+		for (Attendence a : records) {
+
+	        AttendenceResponse resp = new AttendenceResponse();
+	        resp.setId(a.getId());
+	        resp.setDate(a.getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+	        resp.setStatus(a.getLoginTime() != null ? "P" : "A");
+
+	        resp.setLoginTime(a.getLoginTime() != null ?
+	                a.getLoginTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) : null);
+
+	        resp.setLogoutTime(a.getLogoutTime() != null ?
+	                a.getLogoutTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) : null);
+
+	        attendenceResponse.add(resp);
+	    }
+
+	    String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+	    response.setIsSuccess(true);
+	    response.setStatus("Success");
+	    response.setMessage(msg);
+	    response.setData(attendenceResponse);
+
 		
 		return response;
 	}
