@@ -120,4 +120,26 @@ public class UserServiceImpl implements UserService {
 		return response;
 	}
 
+	@Override
+	public UserListResponse allUsers(String operation) {
+		
+		UserListResponse response = new UserListResponse();
+		
+		List<Users> users = userRepository.findAll();
+		
+		if(!users.isEmpty() && users != null) {
+			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+			response.setIsSuccess(true);
+			response.setMessage(msg);
+			response.setStatus("Success");
+			response.setUsers(users);
+		}else {
+			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
+			response.setIsSuccess(false);
+			response.setMessage(msg);
+			response.setStatus("Failed");
+		}
+		return response;
+	}
+
 }

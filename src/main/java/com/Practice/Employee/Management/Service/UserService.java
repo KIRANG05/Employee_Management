@@ -13,4 +13,6 @@ public interface UserService {
 
 	GenericResponse changePassword(ChangePasswordRequest passwordRequest, String username, String operation);
 
+	UserListResponse allUsers(String operation);
+
 }

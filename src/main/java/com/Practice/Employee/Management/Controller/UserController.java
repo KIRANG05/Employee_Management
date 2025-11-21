@@ -124,5 +124,26 @@ public class UserController {
 					.body(response);
 		}
 	}
+	
+	
+	@GetMapping("/allUsers")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
+	public ResponseEntity<UserListResponse> allUsers(HttpServletRequest request){
+		
+		String operation = request.getRequestURI();
+		
+		UserListResponse response = userService.allUsers(operation);
+		
+		if(response.getIsSuccess()) {
+			return ResponseEntity
+					.status(HttpStatus.OK)
+					.body(response);	
+		} else {
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(response);
+		}
+		
+	}
 
 }
