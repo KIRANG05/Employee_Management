@@ -15,4 +15,6 @@ public interface AttendenceService {
 
 	GenericResponse<List<AttendenceResponse>> adminAttendence(Long employeeId, int year, int month, String operation);
 
+	GenericResponse<AttendenceResponse> getTodayStatus(String operation, String name);
+
 }

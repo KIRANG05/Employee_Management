@@ -20,7 +20,7 @@ public class Attendence {
 	private Long id;
 	@ManyToOne
 	@JoinColumn(name = "employee_id")
-	private Users employee;
+	private Users user;
 	private LocalDate date;
 	private LocalDateTime loginTime;
 	private LocalDateTime logoutTime;
@@ -30,11 +30,11 @@ public class Attendence {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Users getEmployee() {
-		return employee;
+	public Users getUser() {
+		return user;
 	}
-	public void setEmployee(Users employee) {
-		this.employee = employee;
+	public void setUser(Users user) {
+		this.user = user;
 	}
 	public LocalDate getDate() {
 		return date;
@@ -56,7 +56,7 @@ public class Attendence {
 	}
 	@Override
 	public String toString() {
-		return "Attendence [id=" + id + ", employee=" + employee + ", date=" + date + ", loginTime=" + loginTime
+		return "Attendence [id=" + id + ", user=" + user + ", date=" + date + ", loginTime=" + loginTime
 				+ ", logoutTime=" + logoutTime + "]";
 	}
 	

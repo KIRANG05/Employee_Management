@@ -22,5 +22,6 @@ public class ResponseCode {
 	public static final String ROLE_UPDATE_FAILED = "E007";
 	public static final String LEAVE_APPLIED_SUCCESS = "A010";
 	public static final String LEAVE_APPLIED_FAILED = "E008";
-
+	public static final String NO_ATTENDENCE_TODAY = "A011";
+	public static final String ATTENDENCE_FOUND = "A012";
 }

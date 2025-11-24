@@ -1,5 +1,6 @@
 package com.Practice.Employee.Management.ServiceImpl;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -7,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.Practice.Employee.Management.Modal.Attendence;
 import com.Practice.Employee.Management.Modal.Users;
@@ -18,6 +21,8 @@ import com.Practice.Employee.Management.ResponseModal.AttendenceResponse;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.AttendenceService;
 import com.Practice.Employee.Management.utils.ResponseCode;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class AttendenceServiceImpl implements AttendenceService {
@@ -44,7 +49,10 @@ public class AttendenceServiceImpl implements AttendenceService {
 		LocalDate today = LocalDate.now();
 		
 		Optional<Attendence> existing = attendenceRepository
-	            .findByEmployeeUsernameAndDate(username, today);
+	            .findFirstByUserIdAndDate(user.getId(), today);
+		
+//		Attendence attendence = list.isEmpty() ? null : list.get(0);
+	            
 		
 		 if (existing.isPresent()) {
 			 String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
@@ -56,13 +64,13 @@ public class AttendenceServiceImpl implements AttendenceService {
 		    }
 		
 		Attendence attendence = new Attendence();
-		attendence.setEmployee(user);
+		attendence.setUser(user);
 		attendence.setDate(today);
 		attendence.setLoginTime(LocalDateTime.now());
 		
 		Attendence saved = attendenceRepository.save(attendence);
 		
-		attendenceResponse.setId(saved.getEmployee().getId());
+		attendenceResponse.setId(saved.getUser().getId());
 		attendenceResponse.setDate(today.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 		attendenceResponse.setLoginTime(saved.getLoginTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
 		attendenceResponse.setLogoutTime(null);
@@ -90,11 +98,13 @@ public class AttendenceServiceImpl implements AttendenceService {
 		
 		LocalDate today = LocalDate.now();
 		
-		Attendence attendence = attendenceRepository
-	            .findByEmployeeUsernameAndDate(username, today)
-	            .orElse(null);
+		Optional<Attendence> attendenceOpt = attendenceRepository
+	            .findFirstByUserIdAndDate(user.getId(), today);
 		
-		 if (attendence == null ) {
+//		Attendence attendence = list.isEmpty() ? null : list.get(0);
+	            
+		
+		 if (attendenceOpt.isEmpty()) {
 			 String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
 		        response.setIsSuccess(false);
 		        response.setStatus("Failed");
@@ -102,11 +112,13 @@ public class AttendenceServiceImpl implements AttendenceService {
 		        response.setData(null);
 		        return response;
 		    }
+		 Attendence attendence = attendenceOpt.get();
 		 
 		 if (attendence.getLogoutTime() != null) {
+			 String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
 		        response.setIsSuccess(false);
 		        response.setStatus("Failed");
-		        response.setMessage("Already punched out today");
+		        response.setMessage(msg);
 		        response.setData(null);
 		        return response;
 		    }
@@ -116,7 +128,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 		
 		Attendence saved = attendenceRepository.save(attendence);
 		
-		attendenceResponse.setId(saved.getEmployee().getId());
+		attendenceResponse.setId(saved.getId());
 		attendenceResponse.setDate(today.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 		attendenceResponse.setLoginTime(saved.getLoginTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
 		attendenceResponse.setLogoutTime(saved.getLogoutTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
@@ -144,7 +156,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 				.orElseThrow(() -> new RuntimeException("User Not Found"));
 		
 		List<Attendence> records = attendenceRepository
-	            .findAllByEmployeeMonth(user.getId(), year, month);
+	            .findAllByUserMonth(user.getId(), year, month);
 		
 		for (Attendence attendence : records) {
 			  AttendenceResponse resp = new AttendenceResponse();
@@ -174,7 +186,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 		List<AttendenceResponse> attendenceResponse = new ArrayList<>();
 		
 		List<Attendence> records = attendenceRepository
-	            .findAllByEmployeeMonth(employeeId, year, month);
+	            .findAllByUserMonth(employeeId, year, month);
 		
 		for (Attendence a : records) {
 
@@ -201,5 +213,46 @@ public class AttendenceServiceImpl implements AttendenceService {
 		
 		return response;
 	}
+
+	@Override
+	public GenericResponse<AttendenceResponse> getTodayStatus(String operation, String username) {
+		
+		
+		GenericResponse<AttendenceResponse> response = new GenericResponse<>();
+		
+		Users user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new RuntimeException("User Not Found"));
+		
+		LocalDate today = LocalDate.now();
+	    Optional<Attendence> attendence = attendenceRepository.findFirstByUserIdAndDate(user.getId(), today);
+	    
+	    if (attendence.isEmpty()) {
+	    	String msg = responseCode.getMessageByCode(ResponseCode.NO_ATTENDENCE_TODAY, operation);
+	        response.setIsSuccess(true);
+	        response.setStatus("Success");
+	        response.setMessage(msg);
+	        response.setData(null);
+	        return response;
+	    }
+	    
+	    Attendence a = attendence.get();
+	    AttendenceResponse res = new AttendenceResponse();
+	    res.setId(a.getUser().getId());
+	    res.setDate(today.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+	    res.setLoginTime(a.getLoginTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+	    res.setLogoutTime(a.getLogoutTime() != null ? a.getLogoutTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) : null);
+	    res.setStatus("P");
+
+	    String msg = responseCode.getMessageByCode(ResponseCode.ATTENDENCE_FOUND, operation);
+	    response.setIsSuccess(true);
+	    response.setStatus("Success");
+	    response.setMessage(msg);
+	    response.setData(res);
+	    return response;
+		
+		
+	}
+	
+	
 
 }
