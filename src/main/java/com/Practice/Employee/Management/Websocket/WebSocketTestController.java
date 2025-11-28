@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Practice.Employee.Management.ResponseModal.NotificationResponse;
+
 @RestController
 @RequestMapping("/test")
 public class WebSocketTestController {
@@ -21,13 +23,11 @@ public class WebSocketTestController {
 	
 	@GetMapping("/user/{userId}")
 	public String testUser(@PathVariable Long userId) {
-		NotificationEvent event = new NotificationEvent(
-				"TEST",
-				"Hello User " + userId,
-				userId,
-				LocalDateTime.now(),
-				null
-				);
+		NotificationResponse event = new NotificationResponse();
+		event.setId(userId);
+		event.setType("TEST");
+		event.setMessage("Hello User " + userId);
+		event.setCreatedAt(LocalDateTime.now());
 
 		sender.sendToUser(userId, event);
 		return "Sent to user " + userId;
