@@ -10,6 +10,7 @@ public class NotificationResponse {
     private String type;
     private String message;
     private Boolean isRead;
+    private Long userId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime createdAt;
 	public Long getId() {
@@ -42,10 +43,17 @@ public class NotificationResponse {
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
+	
+	public Long getUserId() {
+		return userId;
+	}
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 	@Override
 	public String toString() {
 		return "NotificationResponse [id=" + id + ", type=" + type + ", message=" + message + ", isRead=" + isRead
-				+ ", createdAt=" + createdAt + "]";
+				+ ", userId=" + userId + ", createdAt=" + createdAt + "]";
 	}
     
     

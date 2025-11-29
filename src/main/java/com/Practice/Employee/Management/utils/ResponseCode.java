@@ -24,4 +24,8 @@ public class ResponseCode {
 	public static final String LEAVE_APPLIED_FAILED = "E008";
 	public static final String NO_ATTENDENCE_TODAY = "A011";
 	public static final String ATTENDENCE_FOUND = "A012";
+	public static final String NOTIFICATION_SENT_SUCCESS = "A013";
+	public static final String NOTIFICATION_SENT_FAILED = "E009";
+	public static final String NOTIFICATION_NOT_FOUND = "E010";
+	public static final String NOTIFICATION_MARKED_AS_READ = "A014";
 }
