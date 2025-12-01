@@ -17,7 +17,19 @@ public class NotificationWebSocketSender {
 	 // Send message to a specific user
     public void sendToUser(Long userId, NotificationResponse event) {
     	simpMessagingTemplate.convertAndSend("/topic/user/" + userId, event);
+    	
+    	
     }
+    
+    public void sendToEmployee(Long employeeId, NotificationResponse notification) {
+        simpMessagingTemplate.convertAndSend("/topic/employee/" + employeeId, notification);
+    }
+
+    public void sendToHR(Long hrId, NotificationResponse notification) {
+        simpMessagingTemplate.convertAndSend("/topic/hr/" + hrId, notification);
+    }
+
+
 
  // GLOBAL notification – all users
     public void sendGlobal(NotificationResponse event) {
@@ -25,7 +37,7 @@ public class NotificationWebSocketSender {
     }
     
     public void sendToAdminDashboard(NotificationResponse event) {
-    	simpMessagingTemplate.convertAndSend("/topic/admin-dashboard", event);
+    	simpMessagingTemplate.convertAndSend("/topic/admin/notification", event);
     }
     
 }

@@ -9,13 +9,13 @@ import com.Practice.Employee.Management.ResponseModal.PagedResponse;
 
 public interface NotificationService {
 
-	GenericResponse<NotificationResponse> saveNotification(Notification notification, Boolean sendToAdminAlso);
+	GenericResponse<NotificationResponse> saveNotification(Notification notification);
 
-	GenericResponse<List<NotificationResponse>> getUserNotifications(Long userId, String operation);
+//	GenericResponse<List<NotificationResponse>> getUserNotifications(Long userId, String operation);
 
 	GenericResponse<String> markNotificationAsRead(Long notificationId, String operation);
 
-	GenericResponse<PagedResponse<NotificationResponse>> getNotificationsWithPagination(Long userId, int page, int size,
+	GenericResponse<PagedResponse<NotificationResponse>> getNotificationsWithPagination(Long userId, String role, int page, int size,
 			String operation);
 
 }

@@ -29,14 +29,16 @@ public class NotificationServiceImpl implements NotificationService{
 	private ResponseCodeRespository resposeCode;
     private HttpServletRequest request; 
 	
-	public NotificationServiceImpl(NotificationRepository notificationRepository, NotificationWebSocketSender notificationWebSocketSender, HttpServletRequest request) {
+	public NotificationServiceImpl(NotificationRepository notificationRepository, NotificationWebSocketSender notificationWebSocketSender, HttpServletRequest request,
+			ResponseCodeRespository resposeCode) {
 		this.notificationRepository = notificationRepository;
 		this.notificationWebSocketSender = notificationWebSocketSender;
 		this.request = request;
+		this.resposeCode = resposeCode;
 	}
 
 	@Override
-	public GenericResponse<NotificationResponse> saveNotification(Notification notification, Boolean sendToAdminAlso) {
+	public GenericResponse<NotificationResponse> saveNotification(Notification notification) {
 		
 		GenericResponse<NotificationResponse> response = new GenericResponse<>();
 		 NotificationResponse notificationResponse = new NotificationResponse();
@@ -45,25 +47,38 @@ public class NotificationServiceImpl implements NotificationService{
 			 Notification result = notificationRepository.save(notification);
 				
 			 notificationResponse.setId(result.getId());
-			 notificationResponse.setType(result.getType());
-			 notificationResponse.setMessage(result.getMessage());
-			 notificationResponse.setIsRead(result.getIsRead());
-			 notificationResponse.setCreatedAt(result.getCreatedAt());
-			 notificationResponse.setUserId(result.getUserId());
+		        notificationResponse.setType(result.getType());
+		        notificationResponse.setMessage(result.getMessage());
+		        notificationResponse.setEmployeeId(result.getEmployeeId());
+		        notificationResponse.setHrId(result.getHrId());
+		        notificationResponse.setSendToEmployee(result.getSendToEmployee());
+		        notificationResponse.setSendToHR(result.getSendToHR());
+		        notificationResponse.setSendToAdmin(result.getSendToAdmin());
+		        notificationResponse.setIsRead(result.getIsRead());
+		        notificationResponse.setCreatedAt(result.getCreatedAt());
 			 
-			 notificationWebSocketSender.sendToUser(result.getUserId(), notificationResponse);
 			 
-			 if (Boolean.TRUE.equals(sendToAdminAlso)) {
-				 notificationWebSocketSender.sendToAdminDashboard(notificationResponse);
-			    }
-			 
+		        if (Boolean.TRUE.equals(result.getSendToEmployee()) && result.getEmployeeId() != null) {
+		            notificationWebSocketSender.sendToEmployee(result.getEmployeeId(), notificationResponse);
+		        }
+
+		        if (Boolean.TRUE.equals(result.getSendToHR()) && result.getHrId() != null) {
+		            notificationWebSocketSender.sendToHR(result.getHrId(), notificationResponse);
+		        }
+
+		        if (Boolean.TRUE.equals(result.getSendToAdmin())) {
+		            notificationWebSocketSender.sendToAdminDashboard(notificationResponse);
+		        }
 			 String msg = resposeCode.getMessageByCode(ResponseCode.NOTIFICATION_SENT_SUCCESS, operation);
+			System.out.println("Notification Sent Success");
 			 response.setIsSuccess(true);
 			 response.setMessage(msg);
 			 response.setStatus("Success");
 			 response.setData(notificationResponse); 
 		 } catch (Exception e) {
-			 String msg = resposeCode.getMessageByCode(ResponseCode.NOTIFICATION_SENT_SUCCESS, operation);
+			 e.printStackTrace();
+			 String msg = resposeCode.getMessageByCode(ResponseCode.NOTIFICATION_SENT_FAILED, operation);
+			 System.out.println("Notification Sent Failed");
 			 response.setIsSuccess(false);
 			 response.setMessage(msg);
 			 response.setStatus("Failed");
@@ -72,44 +87,44 @@ public class NotificationServiceImpl implements NotificationService{
 		return response;
 	}
 	
-	@Override
-	public GenericResponse<List<NotificationResponse>> getUserNotifications(Long userId, String operation) {
-
-	    GenericResponse<List<NotificationResponse>> response = new GenericResponse<>();
-
-	    try {
-	        List<Notification> list = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
-
-	        List<NotificationResponse> responseList = new ArrayList<NotificationResponse>();
-
-	        for (Notification notification : list) {
-	            NotificationResponse notificationResponse = new NotificationResponse();
-	            notificationResponse.setId(notification.getId());
-	            notificationResponse.setType(notification.getType());
-	            notificationResponse.setMessage(notification.getMessage());
-	            notificationResponse.setIsRead(notification.getIsRead());
-	            notificationResponse.setCreatedAt(notification.getCreatedAt()); // or formatted date if needed
-	            notificationResponse.setUserId(notification.getUserId());
-	            
-	            responseList.add(notificationResponse);
-	        }
-
-	        String msg = resposeCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
-	        response.setIsSuccess(true);
-	        response.setStatus("Success");
-	        response.setMessage(msg);
-	        response.setData(responseList);
-
-	    } catch (Exception e) {
-	        String msg = resposeCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
-	        response.setIsSuccess(false);
-	        response.setStatus("Failed");
-	        response.setMessage(msg);
-	        response.setData(null);
-	    }
-
-	    return response;
-	}
+//	@Override
+//	public GenericResponse<List<NotificationResponse>> getUserNotifications(Long userId, String operation) {
+//
+//	    GenericResponse<List<NotificationResponse>> response = new GenericResponse<>();
+//
+//	    try {
+//	        List<Notification> list = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+//
+//	        List<NotificationResponse> responseList = new ArrayList<NotificationResponse>();
+//
+//	        for (Notification notification : list) {
+//	            NotificationResponse notificationResponse = new NotificationResponse();
+//	            notificationResponse.setId(notification.getId());
+//	            notificationResponse.setType(notification.getType());
+//	            notificationResponse.setMessage(notification.getMessage());
+//	            notificationResponse.setIsRead(notification.getIsRead());
+//	            notificationResponse.setCreatedAt(notification.getCreatedAt()); // or formatted date if needed
+//	            notificationResponse.setUserId(notification.getUserId());
+//	            
+//	            responseList.add(notificationResponse);
+//	        }
+//
+//	        String msg = resposeCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+//	        response.setIsSuccess(true);
+//	        response.setStatus("Success");
+//	        response.setMessage(msg);
+//	        response.setData(responseList);
+//
+//	    } catch (Exception e) {
+//	        String msg = resposeCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
+//	        response.setIsSuccess(false);
+//	        response.setStatus("Failed");
+//	        response.setMessage(msg);
+//	        response.setData(null);
+//	    }
+//
+//	    return response;
+//	}
 	
 	@Override
 	public GenericResponse<String> markNotificationAsRead(Long notificationId, String operation) {
@@ -137,50 +152,110 @@ public class NotificationServiceImpl implements NotificationService{
 	    return response;
 	}
 
+//	@Override
+//	public GenericResponse<PagedResponse<NotificationResponse>> getNotificationsWithPagination(Long userId, int page,
+//			int size, String operation) {
+//		 GenericResponse<PagedResponse<NotificationResponse>> response = new GenericResponse<>();
+//
+//		 try {
+//		    Pageable pageable = PageRequest.of(page, size);
+//		    Page<Notification> resultPage = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+//
+//		    List<NotificationResponse> list = new ArrayList<NotificationResponse>();
+//
+//		    for (Notification notification : resultPage.getContent()) {
+//		        NotificationResponse notificationResponse = new NotificationResponse();
+//		        notificationResponse.setId(notification.getId());
+//		        notificationResponse.setUserId(notification.getUserId());
+//		        notificationResponse.setType(notification.getType());
+//		        notificationResponse.setMessage(notification.getMessage());
+//		        notificationResponse.setIsRead(notification.getIsRead());
+//		        notificationResponse.setCreatedAt(notification.getCreatedAt());
+//		        list.add(notificationResponse);
+//		    }
+//
+//		    PagedResponse<NotificationResponse> paged = new PagedResponse<>();
+//		    paged.setContent(list);
+//		    paged.setPageNumber(resultPage.getNumber());
+//		    paged.setPageSize(resultPage.getSize());
+//		    paged.setTotalPages(resultPage.getTotalPages());
+//		    paged.setTotalElements(resultPage.getTotalElements());
+//
+//		    String msg = resposeCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+//		    response.setIsSuccess(true);
+//		    response.setStatus("Success");
+//		    response.setMessage(msg);
+//		    response.setData(paged);
+//		 } catch (Exception e) {
+//			 String msg = resposeCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
+//			    response.setIsSuccess(false);
+//			    response.setStatus("Failed");
+//			    response.setMessage(msg);
+//			    response.setData(null);
+//		}
+//
+//		    return response;
+//	}
+
+	
 	@Override
-	public GenericResponse<PagedResponse<NotificationResponse>> getNotificationsWithPagination(Long userId, int page,
-			int size, String operation) {
-		 GenericResponse<PagedResponse<NotificationResponse>> response = new GenericResponse<>();
+	public GenericResponse<PagedResponse<NotificationResponse>> getNotificationsWithPagination(
+	        Long id, String role, int page, int size, String operation) {
 
-		 try {
-		    Pageable pageable = PageRequest.of(page, size);
-		    Page<Notification> resultPage = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+	    GenericResponse<PagedResponse<NotificationResponse>> response = new GenericResponse<>();
 
-		    List<NotificationResponse> list = new ArrayList<NotificationResponse>();
+	    try {
+	        Pageable pageable = PageRequest.of(page, size);
+	        Page<Notification> resultPage;
 
-		    for (Notification notification : resultPage.getContent()) {
-		        NotificationResponse notificationResponse = new NotificationResponse();
-		        notificationResponse.setId(notification.getId());
-		        notificationResponse.setUserId(notification.getUserId());
-		        notificationResponse.setType(notification.getType());
-		        notificationResponse.setMessage(notification.getMessage());
-		        notificationResponse.setIsRead(notification.getIsRead());
-		        notificationResponse.setCreatedAt(notification.getCreatedAt());
-		        list.add(notificationResponse);
-		    }
+	        if (role.equals("ROLE_EMPLOYEE")) {
+	            resultPage = notificationRepository.findByEmployeeIdOrderByCreatedAtDesc(id, pageable);
+	        } 
+	        else if (role.equals("ROLE_HR")) {
+	            resultPage = notificationRepository.findByHrIdOrderByCreatedAtDesc(id, pageable);
+	        } 
+	        else if (role.equals("ROLE_ADMIN")) {
+	            resultPage = notificationRepository.findBySendToAdminOrderByCreatedAtDesc(true, pageable);
+	        } 
+	        else {
+	            throw new RuntimeException("Invalid role");
+	        }
 
-		    PagedResponse<NotificationResponse> paged = new PagedResponse<>();
-		    paged.setContent(list);
-		    paged.setPageNumber(resultPage.getNumber());
-		    paged.setPageSize(resultPage.getSize());
-		    paged.setTotalPages(resultPage.getTotalPages());
-		    paged.setTotalElements(resultPage.getTotalElements());
+	        List<NotificationResponse> list = new ArrayList<>();
+	        for (Notification notification : resultPage.getContent()) {
+	            NotificationResponse dto = new NotificationResponse();
+	            dto.setId(notification.getId());
+	            dto.setMessage(notification.getMessage());
+	            dto.setType(notification.getType());
+	            dto.setIsRead(notification.getIsRead());
+	            dto.setCreatedAt(notification.getCreatedAt());
+	            list.add(dto);
+	        }
 
-		    String msg = resposeCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
-		    response.setIsSuccess(true);
-		    response.setStatus("Success");
-		    response.setMessage(msg);
-		    response.setData(paged);
-		 } catch (Exception e) {
-			 String msg = resposeCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
-			    response.setIsSuccess(false);
-			    response.setStatus("Failed");
-			    response.setMessage(msg);
-			    response.setData(null);
-		}
+	        PagedResponse<NotificationResponse> paged = new PagedResponse<>();
+	        paged.setContent(list);
+	        paged.setPageNumber(resultPage.getNumber());
+	        paged.setPageSize(resultPage.getSize());
+	        paged.setTotalPages(resultPage.getTotalPages());
+	        paged.setTotalElements(resultPage.getTotalElements());
 
-		    return response;
+	        String msg = resposeCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+	        response.setIsSuccess(true);
+	        response.setStatus("Success");
+	        response.setMessage(msg);
+	        response.setData(paged);
+
+	    } catch (Exception e) {
+	    	String msg = resposeCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
+	        response.setIsSuccess(false);
+	        response.setStatus("Failed");
+	        response.setMessage(msg);
+	        response.setData(null);
+	    }
+
+	    return response;
 	}
+
 
 
 

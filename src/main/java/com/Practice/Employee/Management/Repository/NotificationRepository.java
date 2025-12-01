@@ -10,8 +10,11 @@ import com.Practice.Employee.Management.Modal.Notification;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 	
-	List<Notification> findByUserIdOrderByCreatedAtDesc(Long userId);
-	Page<Notification> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+//	List<Notification> findByUserIdOrderByCreatedAtDesc(Long userId);
+//	Page<Notification> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+	Page<Notification> findByEmployeeIdOrderByCreatedAtDesc(Long id, Pageable pageable);
+	Page<Notification> findByHrIdOrderByCreatedAtDesc(Long id, Pageable pageable);
+	Page<Notification> findBySendToAdminOrderByCreatedAtDesc(boolean b, Pageable pageable);
 
 
 

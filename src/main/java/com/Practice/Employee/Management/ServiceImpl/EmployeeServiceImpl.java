@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.Practice.Employee.Management.Modal.Employee;
+import com.Practice.Employee.Management.Modal.Notification;
 import com.Practice.Employee.Management.Modal.Role;
 import com.Practice.Employee.Management.Modal.Users;
 import com.Practice.Employee.Management.Repository.EmployeeRepository;
@@ -26,6 +27,9 @@ import com.Practice.Employee.Management.Repository.UserRepository;
 import com.Practice.Employee.Management.ResponseModal.EmployeeResponse;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.EmployeeService;
+import com.Practice.Employee.Management.Service.NotificationService;
+import com.Practice.Employee.Management.utils.NotificationMessage;
+import com.Practice.Employee.Management.utils.NotificationType;
 import com.Practice.Employee.Management.utils.ResponseCode;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,10 +47,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private UserRepository userRepository;
 	
 	private final PasswordEncoder passwordEncoder;
+	private NotificationService notificationService;
 	
-	public EmployeeServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+	
+	public EmployeeServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, NotificationService notificationService
+			 ) {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.notificationService = notificationService;
+		
 	}
 	
 	@Value("${employee.images.path}")
@@ -62,14 +71,29 @@ public class EmployeeServiceImpl implements EmployeeService {
 		
 		try {
 		if(image != null && !image.isEmpty()) {
+			try {
 			String fileName = UUID.randomUUID().toString() +"_"+ image.getOriginalFilename();
 			Path filePath = Paths.get(imageUploadPath, fileName);
 			Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 			employee.setProfileImage(fileName);
+			 } catch (Exception e) {
+	                logger.error("Image upload failed — proceeding without image", e);
+	                // ❌ Do NOT send error response, allow to save employee
+	            }
 		}
 		
 		Users user = new Users();
-		user.setUsername(employee.getName().toLowerCase().replace(" ", "."));
+		String username = employee.getName();
+		
+		if (userRepository.existsByUsername(username)) {
+			String msg = responseCode.getMessageByCode(ResponseCode.USERNAME_ALREADY_EXISTS, operation);
+		    response.setIsSuccess(false);
+		    response.setStatus("Failed");	    
+		    response.setMessage(msg);
+		    return response;
+		}
+		
+		user.setUsername(username);
 		user.setPassword(passwordEncoder.encode("default123")); // default password
 		user.setRole(Role.ROLE_EMPLOYEE); // default role
 		userRepository.save(user);
@@ -87,6 +111,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 			response.setEmployee(result);
 			
 			logger.info("Employee Saved Successfully With ID: {}", result.getId());
+			
+			Notification notification = new Notification();
+			notification.setType(NotificationType.EMPLOYEE_ADDED);
+			notification.setMessage(NotificationMessage.WELCOME_MESSAGE +", " + result.getName() + "!");
+			notification.setEmployeeId(result.getId());
+			notification.setSendToEmployee(true);       // push to employee dashboard
+            notification.setSendToHR(false);
+            notification.setSendToAdmin(true);
+			
+			notificationService.saveNotification(notification);
+			System.out.println("Notification Called");
 		} else {
 			String msg = responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_FAILED, operation);
 			response.setIsSuccess(false);
@@ -96,9 +131,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 			logger.error("Failed To Save Employee — Repository Did Not Return Entity. Name: {}", employee.getName());
 		}
 		}catch (Exception e) {
-			 logger.error("Error while saving employee image: ", e);
+			 logger.error("Unexpected error in save() method:", e);
 		        response.setIsSuccess(false);
-		        response.setMessage("Failed to upload image");
+		        response.setMessage("Something went wrong while saving employee");
 		        response.setStatus("Error");
 		}
 		return response;

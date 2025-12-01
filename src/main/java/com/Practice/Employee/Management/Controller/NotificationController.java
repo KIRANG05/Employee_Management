@@ -34,12 +34,11 @@ public class NotificationController {
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<GenericResponse<NotificationResponse>> createNotification(
-            @RequestBody Notification notification,
-            Boolean sendToAdminAlso
+            @RequestBody Notification notification
            ) {
 
        
-        GenericResponse<NotificationResponse> response = notificationService.saveNotification(notification, sendToAdminAlso);
+        GenericResponse<NotificationResponse> response = notificationService.saveNotification(notification);
 
         if (response.getIsSuccess()) {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -48,21 +47,21 @@ public class NotificationController {
         }
     }
     
-    @GetMapping("/fetch")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<GenericResponse<List<NotificationResponse>>> getUserNotifications(
-            @RequestParam Long userId,
-            HttpServletRequest request) {
-
-        String operation = request.getRequestURI();
-        GenericResponse<List<NotificationResponse>> response = notificationService.getUserNotifications(userId, operation);
-
-        if (response.getIsSuccess()) {
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-    }
+//    @GetMapping("/fetch")
+//    @PreAuthorize("isAuthenticated()")
+//    public ResponseEntity<GenericResponse<List<NotificationResponse>>> getUserNotifications(
+//            @RequestParam Long userId,
+//            HttpServletRequest request) {
+//
+//        String operation = request.getRequestURI();
+//        GenericResponse<List<NotificationResponse>> response = notificationService.getUserNotifications(userId, operation);
+//
+//        if (response.getIsSuccess()) {
+//            return ResponseEntity.status(HttpStatus.OK).body(response);
+//        } else {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+//        }
+//    }
     
     @PutMapping("/read")
     @PreAuthorize("isAuthenticated()")
@@ -84,7 +83,8 @@ public class NotificationController {
     @GetMapping("/fetch-paged")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<GenericResponse<PagedResponse<NotificationResponse>>> fetchPaged(
-            @RequestParam Long userId,
+            @RequestParam Long id,
+            @RequestParam String role,
             @RequestParam int page,
             @RequestParam int size,
             HttpServletRequest request) {
@@ -92,7 +92,7 @@ public class NotificationController {
     	String operation = request.getRequestURI();
 
         GenericResponse<PagedResponse<NotificationResponse>> response =
-                notificationService.getNotificationsWithPagination(userId, page, size, operation);
+                notificationService.getNotificationsWithPagination(id, role, page, size, operation);
 
         if (response.getIsSuccess()) {
             return ResponseEntity.ok(response);

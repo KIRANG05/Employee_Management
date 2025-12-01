@@ -9,8 +9,16 @@ public class NotificationResponse {
 	private Long id;
     private String type;
     private String message;
+    
+    private Long employeeId;
+    private Long hrId;
+
+    private Boolean sendToEmployee;
+    private Boolean sendToHR;
+    private Boolean sendToAdmin;
+    
     private Boolean isRead;
-    private Long userId;
+//    private Long userId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime createdAt;
 	public Long getId() {
@@ -44,17 +52,51 @@ public class NotificationResponse {
 		this.createdAt = createdAt;
 	}
 	
-	public Long getUserId() {
-		return userId;
+//	public Long getUserId() {
+//		return userId;
+//	}
+//	public void setUserId(Long userId) {
+//		this.userId = userId;
+//	}
+	
+	public Long getEmployeeId() {
+		return employeeId;
 	}
-	public void setUserId(Long userId) {
-		this.userId = userId;
+	public void setEmployeeId(Long employeeId) {
+		this.employeeId = employeeId;
+	}
+	public Long getHrId() {
+		return hrId;
+	}
+	public void setHrId(Long hrId) {
+		this.hrId = hrId;
+	}
+	public Boolean getSendToEmployee() {
+		return sendToEmployee;
+	}
+	public void setSendToEmployee(Boolean sendToEmployee) {
+		this.sendToEmployee = sendToEmployee;
+	}
+	public Boolean getSendToHR() {
+		return sendToHR;
+	}
+	public void setSendToHR(Boolean sendToHR) {
+		this.sendToHR = sendToHR;
+	}
+	public Boolean getSendToAdmin() {
+		return sendToAdmin;
+	}
+	public void setSendToAdmin(Boolean sendToAdmin) {
+		this.sendToAdmin = sendToAdmin;
 	}
 	@Override
 	public String toString() {
-		return "NotificationResponse [id=" + id + ", type=" + type + ", message=" + message + ", isRead=" + isRead
-				+ ", userId=" + userId + ", createdAt=" + createdAt + "]";
+		return "NotificationResponse [id=" + id + ", type=" + type + ", message=" + message + ", employeeId="
+				+ employeeId + ", hrId=" + hrId + ", sendToEmployee=" + sendToEmployee + ", sendToHR=" + sendToHR
+				+ ", sendToAdmin=" + sendToAdmin + ", isRead=" + isRead + ", createdAt=" + createdAt + "]";
 	}
+	
+	
     
     
 
