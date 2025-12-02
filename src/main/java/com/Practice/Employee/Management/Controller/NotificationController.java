@@ -1,5 +1,6 @@
 package com.Practice.Employee.Management.Controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +101,21 @@ public class NotificationController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+    
+    @PutMapping("/read-all")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<GenericResponse<String>> markAllAsRead(
+            @RequestParam Long userId,
+            @RequestParam String role,
+            HttpServletRequest request) {
+
+        String operation = request.getRequestURI();
+        GenericResponse<String> response = notificationService.markAllAsReadByRole(userId, role, operation);
+
+        return ResponseEntity.ok(response);
+    }
+
+
 
 
 

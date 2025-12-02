@@ -18,4 +18,8 @@ public interface NotificationService {
 	GenericResponse<PagedResponse<NotificationResponse>> getNotificationsWithPagination(Long userId, String role, int page, int size,
 			String operation);
 
+//	GenericResponse<String> markAllAsReadByUsername(String username, String operation);
+
+	GenericResponse<String> markAllAsReadByRole(Long userId, String role, String operation);
+
 }

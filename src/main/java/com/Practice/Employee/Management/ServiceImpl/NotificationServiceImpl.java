@@ -10,8 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.Practice.Employee.Management.Modal.Notification;
+import com.Practice.Employee.Management.Modal.Users;
 import com.Practice.Employee.Management.Repository.NotificationRepository;
 import com.Practice.Employee.Management.Repository.ResponseCodeRespository;
+import com.Practice.Employee.Management.Repository.UserRepository;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.ResponseModal.NotificationResponse;
 import com.Practice.Employee.Management.ResponseModal.PagedResponse;
@@ -28,13 +30,15 @@ public class NotificationServiceImpl implements NotificationService{
 	private NotificationWebSocketSender notificationWebSocketSender;
 	private ResponseCodeRespository resposeCode;
     private HttpServletRequest request; 
+    private UserRepository userRepository;
 	
 	public NotificationServiceImpl(NotificationRepository notificationRepository, NotificationWebSocketSender notificationWebSocketSender, HttpServletRequest request,
-			ResponseCodeRespository resposeCode) {
+			ResponseCodeRespository resposeCode, UserRepository userRepository) {
 		this.notificationRepository = notificationRepository;
 		this.notificationWebSocketSender = notificationWebSocketSender;
 		this.request = request;
 		this.resposeCode = resposeCode;
+		this.userRepository = userRepository;
 	}
 
 	@Override
@@ -255,6 +259,34 @@ public class NotificationServiceImpl implements NotificationService{
 
 	    return response;
 	}
+	
+	
+	@Override
+	public GenericResponse<String> markAllAsReadByRole(Long userId, String role, String operation) {
+
+	    switch (role) {
+	        case "ROLE_EMPLOYEE":
+	            notificationRepository.markAllAsReadForEmployee(userId);
+	            break;
+	        case "ROLE_HR":
+	            notificationRepository.markAllAsReadForHR(userId);
+	            break;
+	        case "ROLE_ADMIN":
+	            notificationRepository.markAllAsReadForAdmin();
+	            break;
+	        default:
+	            throw new RuntimeException("Invalid role");
+	    }
+
+	    GenericResponse<String> response = new GenericResponse<>();
+	    response.setIsSuccess(true);
+	    response.setMessage("All notifications marked as read");
+	    response.setStatus("Success");
+	    return response;
+	}
+
+
+	
 
 
 
