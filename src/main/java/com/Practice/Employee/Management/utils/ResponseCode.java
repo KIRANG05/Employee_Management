@@ -28,4 +28,5 @@ public class ResponseCode {
 	public static final String NOTIFICATION_SENT_FAILED = "E009";
 	public static final String NOTIFICATION_NOT_FOUND = "E010";
 	public static final String NOTIFICATION_MARKED_AS_READ = "A014";
+	public static final String ALREADY_PUNCHED_OUT_TODAY = "E011";
 }

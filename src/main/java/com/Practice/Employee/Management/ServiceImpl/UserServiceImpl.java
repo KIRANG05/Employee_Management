@@ -15,7 +15,10 @@ import com.Practice.Employee.Management.Repository.ResponseCodeRespository;
 import com.Practice.Employee.Management.Repository.UserRepository;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.ResponseModal.UserListResponse;
+import com.Practice.Employee.Management.Service.NotificationService;
 import com.Practice.Employee.Management.Service.UserService;
+import com.Practice.Employee.Management.utils.NotificationMessage;
+import com.Practice.Employee.Management.utils.NotificationType;
 import com.Practice.Employee.Management.utils.ResponseCode;
 
 @Service
@@ -27,10 +30,12 @@ public class UserServiceImpl implements UserService {
 	private ResponseCodeRespository responseCode;
 	
 	private final PasswordEncoder passwordEncoder;
+	private NotificationService notificationService;
 	
-	public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+	public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, NotificationService notificationService) {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.notificationService = notificationService;
 	}
 
 	@Override
@@ -72,6 +77,9 @@ public class UserServiceImpl implements UserService {
 		Users user = result.get();
 		user.setRole(newRole);
 		userRepository.save(user);
+		
+		String notificationMsg = NotificationMessage.ROLE_CHANGE_MESSAGE.replace("{role}", newRole.toString());
+		notificationService.sendNotification(user, NotificationType.ROLE_CHANGE, notificationMsg);
 		
 		String msg = responseCode.getMessageByCode(ResponseCode.ROLE_UPDATE_SUCCESS, operation);
 		response.setIsSuccess(true);

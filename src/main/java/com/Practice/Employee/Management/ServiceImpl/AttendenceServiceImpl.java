@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.Practice.Employee.Management.Modal.Attendence;
+import com.Practice.Employee.Management.Modal.Notification;
 import com.Practice.Employee.Management.Modal.Users;
 import com.Practice.Employee.Management.Repository.AttendenceRepository;
 import com.Practice.Employee.Management.Repository.ResponseCodeRespository;
@@ -20,6 +21,9 @@ import com.Practice.Employee.Management.Repository.UserRepository;
 import com.Practice.Employee.Management.ResponseModal.AttendenceResponse;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.AttendenceService;
+import com.Practice.Employee.Management.Service.NotificationService;
+import com.Practice.Employee.Management.utils.NotificationMessage;
+import com.Practice.Employee.Management.utils.NotificationType;
 import com.Practice.Employee.Management.utils.ResponseCode;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,11 +34,14 @@ public class AttendenceServiceImpl implements AttendenceService {
 	private ResponseCodeRespository responseCode;
 	private UserRepository userRepository;
 	private AttendenceRepository attendenceRepository;
+	private NotificationService notificationService;
 	
-	public AttendenceServiceImpl(ResponseCodeRespository responseCode, UserRepository userRepository, AttendenceRepository attendenceRepository) {
+	public AttendenceServiceImpl(ResponseCodeRespository responseCode, UserRepository userRepository, AttendenceRepository attendenceRepository,
+			NotificationService notificationService) {
 		this.responseCode = responseCode;
 		this.userRepository = userRepository;
 		this.attendenceRepository = attendenceRepository;
+		this.notificationService = notificationService;
 	}
 
 	@Override
@@ -77,6 +84,15 @@ public class AttendenceServiceImpl implements AttendenceService {
 		attendenceResponse.setStatus("P");
 		
 		
+
+		
+		String notificationMsg = "You" + " " +
+		        NotificationMessage.PUNCH_IN_MESSAGE + " " +
+		        saved.getLoginTime().format(DateTimeFormatter.ofPattern("hh:mm a"));
+		
+		notificationService.sendNotification(user, NotificationType.ATTENDENCE, notificationMsg);
+		
+		
 		String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
 		response.setIsSuccess(true);
 		response.setStatus("Success");
@@ -106,8 +122,8 @@ public class AttendenceServiceImpl implements AttendenceService {
 		
 		 if (attendenceOpt.isEmpty()) {
 			 String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
-		        response.setIsSuccess(false);
-		        response.setStatus("Failed");
+		        response.setIsSuccess(true);
+		        response.setStatus("Success");
 		        response.setMessage(msg);
 		        response.setData(null);
 		        return response;
@@ -116,8 +132,8 @@ public class AttendenceServiceImpl implements AttendenceService {
 		 
 		 if (attendence.getLogoutTime() != null) {
 			 String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
-		        response.setIsSuccess(false);
-		        response.setStatus("Failed");
+		        response.setIsSuccess(true);
+		        response.setStatus("Success");
 		        response.setMessage(msg);
 		        response.setData(null);
 		        return response;
@@ -134,6 +150,13 @@ public class AttendenceServiceImpl implements AttendenceService {
 		attendenceResponse.setLogoutTime(saved.getLogoutTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
 		attendenceResponse.setStatus("P");
 		
+		
+		String notificationMsg = "You" + " " +
+		        NotificationMessage.PUNCH_OUT_MESSAGE + " " +
+		        saved.getLoginTime().format(DateTimeFormatter.ofPattern("hh:mm a"));
+		
+		notificationService.sendNotification(user, NotificationType.ATTENDENCE, notificationMsg);
+		System.out.println("Punch in Send to save");
 		
 		String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
 		response.setIsSuccess(true);

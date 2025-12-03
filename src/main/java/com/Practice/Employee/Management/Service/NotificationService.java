@@ -3,11 +3,13 @@ package com.Practice.Employee.Management.Service;
 import java.util.List;
 
 import com.Practice.Employee.Management.Modal.Notification;
+import com.Practice.Employee.Management.Modal.Users;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.ResponseModal.NotificationResponse;
 import com.Practice.Employee.Management.ResponseModal.PagedResponse;
 
 public interface NotificationService {
+	void sendNotification(Users user, String type, String message);
 
 	GenericResponse<NotificationResponse> saveNotification(Notification notification);
 

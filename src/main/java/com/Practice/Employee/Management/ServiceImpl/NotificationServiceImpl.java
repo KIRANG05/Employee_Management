@@ -19,6 +19,7 @@ import com.Practice.Employee.Management.ResponseModal.NotificationResponse;
 import com.Practice.Employee.Management.ResponseModal.PagedResponse;
 import com.Practice.Employee.Management.Service.NotificationService;
 import com.Practice.Employee.Management.Websocket.NotificationWebSocketSender;
+import com.Practice.Employee.Management.utils.NotificationType;
 import com.Practice.Employee.Management.utils.ResponseCode;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +41,42 @@ public class NotificationServiceImpl implements NotificationService{
 		this.resposeCode = resposeCode;
 		this.userRepository = userRepository;
 	}
+	
+	@Override
+	public void sendNotification(Users user, String type, String message) {
+
+	    Notification notification = new Notification();
+	    notification.setType(type);
+	    notification.setMessage(message);
+
+	    // Assign receiver based on user role
+	    String role = user.getRole().name().toUpperCase();
+
+	    switch (role) {
+	        case "ROLE_EMPLOYEE":
+	            notification.setEmployeeId(user.getId());
+	            notification.setSendToEmployee(true);
+	            notification.setSendToHR(false);
+	            notification.setSendToAdmin(false);
+	            break;
+
+	        case "ROLE_HR":
+	            notification.setHrId(user.getId());
+	            notification.setSendToEmployee(false);
+	            notification.setSendToHR(true);
+	            notification.setSendToAdmin(false);
+	            break;
+
+	        case "ROLE_ADMIN":
+	        	  notification.setSendToEmployee(false);
+		            notification.setSendToHR(false);
+		            notification.setSendToAdmin(true);
+	            break;
+	    }
+
+	    saveNotification(notification);
+	}
+
 
 	@Override
 	public GenericResponse<NotificationResponse> saveNotification(Notification notification) {
