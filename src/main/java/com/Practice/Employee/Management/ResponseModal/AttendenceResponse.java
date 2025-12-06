@@ -1,7 +1,10 @@
 package com.Practice.Employee.Management.ResponseModal;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import jakarta.persistence.Id;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AttendenceResponse {
 
 	

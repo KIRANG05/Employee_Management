@@ -3,6 +3,7 @@ package com.Practice.Employee.Management.Service;
 import java.util.List;
 
 import com.Practice.Employee.Management.ResponseModal.AttendenceResponse;
+import com.Practice.Employee.Management.ResponseModal.EmpAttendenceResponse;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 
 public interface AttendenceService {
@@ -16,5 +17,9 @@ public interface AttendenceService {
 	GenericResponse<List<AttendenceResponse>> adminAttendence(Long employeeId, int year, int month, String operation);
 
 	GenericResponse<AttendenceResponse> getTodayStatus(String operation, String name);
+
+	GenericResponse<AttendenceResponse> getTodayStatusByEmpId(String operation, Long empId);
+
+	GenericResponse<List<EmpAttendenceResponse>> getAllTodayAttendance(String operation);
 
 }

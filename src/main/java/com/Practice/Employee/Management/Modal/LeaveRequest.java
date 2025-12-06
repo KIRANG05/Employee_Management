@@ -27,9 +27,11 @@ public class LeaveRequest {
 	private Users employee;
 	private LocalDate fromDate;
 	private LocalDate toDate;
+	@Enumerated(EnumType.STRING)
+	private LeaveType leaveType;
 	private String reason;
 	@Enumerated(EnumType.STRING)
-	private LeaveStatus status = LeaveStatus.PENDING;
+	private LeaveStatus status;
 	private LocalDateTime appliedAt = LocalDateTime.now();
 
 
@@ -76,10 +78,18 @@ public class LeaveRequest {
 		this.appliedAt = appliedAt;
 	}
 
+	
+	public LeaveType getLeaveType() {
+		return leaveType;
+	}
+	public void setLeaveType(LeaveType leaveType) {
+		this.leaveType = leaveType;
+	}
 	@Override
 	public String toString() {
 		return "LeaveRequest [id=" + id + ", employee=" + employee + ", fromDate=" + fromDate + ", toDate=" + toDate
-				+ ", reason=" + reason + ", status=" + status + ", appliedAt=" + appliedAt + "]";
+				+ ", leaveType=" + leaveType + ", reason=" + reason + ", status=" + status + ", appliedAt=" + appliedAt
+				+ "]";
 	}
 
 }

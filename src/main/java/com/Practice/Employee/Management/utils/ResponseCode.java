@@ -29,4 +29,8 @@ public class ResponseCode {
 	public static final String NOTIFICATION_NOT_FOUND = "E010";
 	public static final String NOTIFICATION_MARKED_AS_READ = "A014";
 	public static final String ALREADY_PUNCHED_OUT_TODAY = "E011";
+	public static final String NO_EMPLOYEES_FOUND = "E012";
+	public static final String LEAVE_APPROVED_SUCCESS = "A015";
+	public static final String LEAVE_REJECT_SUCCESS = "A016";
+	public static final String LEAVE_NOT_FOUND = "E013";
 }

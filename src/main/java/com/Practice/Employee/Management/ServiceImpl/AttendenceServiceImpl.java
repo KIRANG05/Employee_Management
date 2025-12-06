@@ -13,12 +13,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.Practice.Employee.Management.Modal.Attendence;
+import com.Practice.Employee.Management.Modal.Employee;
 import com.Practice.Employee.Management.Modal.Notification;
 import com.Practice.Employee.Management.Modal.Users;
 import com.Practice.Employee.Management.Repository.AttendenceRepository;
+import com.Practice.Employee.Management.Repository.EmployeeRepository;
 import com.Practice.Employee.Management.Repository.ResponseCodeRespository;
 import com.Practice.Employee.Management.Repository.UserRepository;
 import com.Practice.Employee.Management.ResponseModal.AttendenceResponse;
+import com.Practice.Employee.Management.ResponseModal.EmpAttendenceResponse;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.AttendenceService;
 import com.Practice.Employee.Management.Service.NotificationService;
@@ -35,13 +38,15 @@ public class AttendenceServiceImpl implements AttendenceService {
 	private UserRepository userRepository;
 	private AttendenceRepository attendenceRepository;
 	private NotificationService notificationService;
+	private EmployeeRepository employeeRepository;
 	
 	public AttendenceServiceImpl(ResponseCodeRespository responseCode, UserRepository userRepository, AttendenceRepository attendenceRepository,
-			NotificationService notificationService) {
+			NotificationService notificationService, EmployeeRepository employeeRepository) {
 		this.responseCode = responseCode;
 		this.userRepository = userRepository;
 		this.attendenceRepository = attendenceRepository;
 		this.notificationService = notificationService;
+		this.employeeRepository = employeeRepository;
 	}
 
 	@Override
@@ -277,5 +282,96 @@ public class AttendenceServiceImpl implements AttendenceService {
 	}
 	
 	
+	@Override
+	public GenericResponse<AttendenceResponse> getTodayStatusByEmpId(String operation, Long empId) {
 
+	    GenericResponse<AttendenceResponse> response = new GenericResponse<>();
+
+	    Users user = userRepository.findById(empId)
+	            .orElseThrow(() -> new RuntimeException("User Not Found"));
+
+	    LocalDate today = LocalDate.now();
+	    Optional<Attendence> attendence = attendenceRepository.findFirstByUserIdAndDate(user.getId(), today);
+
+	    // If no attendance entry for today
+	    if (attendence.isEmpty()) {
+	    	String msg = responseCode.getMessageByCode(ResponseCode.NO_ATTENDENCE_TODAY, operation);
+	        response.setIsSuccess(true);
+	        response.setStatus("Success");
+	        response.setMessage(msg);
+	        response.setData(null);
+	        return response;
+	    }
+
+	    Attendence a = attendence.get();
+	    AttendenceResponse res = new AttendenceResponse();
+	    res.setId(a.getId());
+	    res.setDate(today.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+	    res.setLoginTime(a.getLoginTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+	    res.setLogoutTime(a.getLogoutTime() != null ? a.getLogoutTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")) : null);
+	    res.setStatus("P");
+
+	    String msg = responseCode.getMessageByCode(ResponseCode.ATTENDENCE_FOUND, operation);
+	    response.setIsSuccess(true);
+	    response.setStatus("Success");
+	    response.setMessage(msg);
+	    response.setData(res);
+	    return response;
+	}
+
+	@Override
+	public GenericResponse<List<EmpAttendenceResponse>> getAllTodayAttendance(String operation) {
+		
+		 GenericResponse<List<EmpAttendenceResponse>> response = new GenericResponse<>();
+		 List<EmpAttendenceResponse> responseList  = new ArrayList<>();
+		 
+		 try {
+		 LocalDate today = LocalDate.now();
+		 List<Employee> employees = employeeRepository.findAll();
+		 
+		 if (employees == null || employees.isEmpty()) {
+	            String msg = responseCode.getMessageByCode(ResponseCode.NO_EMPLOYEES_FOUND, operation);
+	            response.setIsSuccess(false);
+	            response.setStatus("Failed");
+	            response.setMessage(msg);
+	            response.setData(null);
+	            return response;
+	        }
+		 
+		 employees.forEach(emp -> {
+		        EmpAttendenceResponse empAttendenceResponse = new EmpAttendenceResponse();
+		        empAttendenceResponse.setEmpId(emp.getId());
+
+		        Attendence attendence = attendenceRepository.findFirstByUserIdAndDate(emp.getId(), today).orElse(null);
+
+		        if (attendence != null) {
+		        	empAttendenceResponse.setId(attendence.getId());
+		        	empAttendenceResponse.setDate(today.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+		        	empAttendenceResponse.setLoginTime(attendence.getLoginTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+		        	empAttendenceResponse.setLogoutTime(attendence.getLogoutTime() != null
+		                    ? attendence.getLogoutTime().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
+		                    : null);
+		        	empAttendenceResponse.setStatus("P");
+		        } else {
+		        	empAttendenceResponse.setStatus("A");
+		        }
+
+		        responseList.add(empAttendenceResponse);
+		    });
+		 
+		 String msg = responseCode.getMessageByCode(ResponseCode.ATTENDENCE_FOUND, operation);
+		    response.setIsSuccess(true);
+		    response.setStatus("Success");
+		    response.setMessage(msg);
+		    response.setData(responseList);
+	} catch (Exception ex) {
+        // ERROR RESPONSE
+        response.setIsSuccess(false);
+        response.setStatus("Error");
+        response.setMessage("Something went wrong while fetching attendance");
+        response.setData(null);
+    }
+		 return response;
+	}
+	
 }

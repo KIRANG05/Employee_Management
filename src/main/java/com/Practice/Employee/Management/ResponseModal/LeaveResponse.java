@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.Practice.Employee.Management.Modal.LeaveRequest;
 import com.Practice.Employee.Management.Modal.LeaveStatus;
+import com.Practice.Employee.Management.Modal.LeaveType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class LeaveResponse {
@@ -16,6 +17,8 @@ public class LeaveResponse {
 	    @JsonFormat(pattern = "dd-MM-yyyy")
 	    private LocalDate toDate;
 	    private String reason;
+	    private LeaveType leaveType;
+
 	    private LeaveStatus leaveStatus;
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 	    private LocalDateTime appliedAt;
@@ -50,10 +53,10 @@ public class LeaveResponse {
 		public void setReason(String reason) {
 			this.reason = reason;
 		}
-		public LeaveStatus getleaveStatus() {
+		public LeaveStatus getLeaveStatus() {
 			return leaveStatus;
 		}
-		public void setleaveStatuss(LeaveStatus leaveStatus) {
+		public void setLeaveStatus(LeaveStatus leaveStatus) {
 			this.leaveStatus = leaveStatus;
 		}
 		public LocalDateTime getAppliedAt() {
@@ -62,10 +65,19 @@ public class LeaveResponse {
 		public void setAppliedAt(LocalDateTime appliedAt) {
 			this.appliedAt = appliedAt;
 		}
+		
+		public LeaveType getLeaveType() {
+			return leaveType;
+		}
+		public void setLeaveType(LeaveType leaveType) {
+			this.leaveType = leaveType;
+		}
+	
 		@Override
 		public String toString() {
 			return "LeaveResponse [id=" + id + ", employeeName=" + employeeName + ", fromDate=" + fromDate + ", toDate="
-					+ toDate + ", reason=" + reason + ", leaveStatus=" + leaveStatus + ", appliedAt=" + appliedAt + "]";
+					+ toDate + ", reason=" + reason + ", leaveType=" + leaveType + ", leaveStatus=" + leaveStatus
+					+ ", appliedAt=" + appliedAt + "]";
 		}
 
 	

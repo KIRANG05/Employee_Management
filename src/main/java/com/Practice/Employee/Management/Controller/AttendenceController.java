@@ -8,12 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Practice.Employee.Management.ResponseModal.AttendenceResponse;
+import com.Practice.Employee.Management.ResponseModal.EmpAttendenceResponse;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.AttendenceService;
 
@@ -125,6 +127,33 @@ public class AttendenceController {
 		
 		
 	}
+	
+	@GetMapping("/today/{empId}")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
+	public ResponseEntity<GenericResponse<AttendenceResponse>> getTodayForEmployee(
+	        @PathVariable Long empId,
+	        HttpServletRequest request) {
+
+	    String operation = request.getRequestURI();
+	    GenericResponse<AttendenceResponse> response = attendenceService.getTodayStatusByEmpId(operation, empId);
+
+	    return response.getIsSuccess()
+	            ? ResponseEntity.status(HttpStatus.OK).body(response)
+	            : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
+	
+	@GetMapping("/today/all")
+	@PreAuthorize("hasAnyRole('ADMIN','HR')")
+	public ResponseEntity<GenericResponse<List<EmpAttendenceResponse>>> getTodayAttendanceForAll(HttpServletRequest request) {
+
+	    String operation = request.getRequestURI();
+	    GenericResponse<List<EmpAttendenceResponse>> response = attendenceService.getAllTodayAttendance(operation);
+
+	    return response.getIsSuccess()
+	            ? ResponseEntity.status(HttpStatus.OK).body(response)
+	            : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
+
 	
 	
 }
