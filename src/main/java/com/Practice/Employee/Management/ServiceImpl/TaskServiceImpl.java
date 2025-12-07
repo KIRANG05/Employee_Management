@@ -3,20 +3,25 @@ package com.Practice.Employee.Management.ServiceImpl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.Practice.Employee.Management.Modal.Employee;
 import com.Practice.Employee.Management.Modal.Task;
 import com.Practice.Employee.Management.Modal.TaskStatus;
+import com.Practice.Employee.Management.Repository.EmployeeRepository;
 import com.Practice.Employee.Management.Repository.ResponseCodeRespository;
 import com.Practice.Employee.Management.Repository.TaskRespository;
+import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.ResponseModal.TaskResponse;
 import com.Practice.Employee.Management.Service.TaskService;
 import com.Practice.Employee.Management.utils.ResponseCode;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -26,16 +31,19 @@ public class TaskServiceImpl implements TaskService {
 
 
 	private TaskRespository taskRepository;
+	private EmployeeRepository employeeRepository;
 
 
-	public TaskServiceImpl(TaskRespository taskrepository) {
+	public TaskServiceImpl(TaskRespository taskrepository, EmployeeRepository employeeRepository) {
 		this.taskRepository = taskrepository;
+		this.employeeRepository = employeeRepository;
 	}
 
 	@Override
-	public TaskResponse addTask(Task task, String opeartion) {
-
-		TaskResponse response = new TaskResponse();
+	public GenericResponse<TaskResponse> addTask(Task task, String opeartion) {
+		
+		GenericResponse<TaskResponse> response = new GenericResponse<>();
+		TaskResponse taskResponse = new TaskResponse();
 
 		if (task.getStatus() == null) {
 			task.setStatus(TaskStatus.PENDING);
@@ -46,11 +54,12 @@ public class TaskServiceImpl implements TaskService {
 		Task result = taskRepository.save(task);
 
 		if(result != null) {
+			taskResponse.setTask(result);
 			String msg = responseCodeRepository.getMessageByCode(ResponseCode.TASK_ADDED_SUCCESS, opeartion);
 			response.setIsSuccess(true);
 			response.setMessage(msg);
 			response.setStatus("Success");
-			response.setTask(result);
+			response.setData(taskResponse);
 		} else {
 			String msg = responseCodeRepository.getMessageByCode(ResponseCode.TASK_ADDED_FAILED, opeartion);
 			response.setIsSuccess(false);
@@ -62,18 +71,20 @@ public class TaskServiceImpl implements TaskService {
 	}
 
 	@Override
-	public TaskResponse getAllTasks(String operation) {
+	public GenericResponse<TaskResponse> getAllTasks(String operation) {
+		GenericResponse<TaskResponse> response = new GenericResponse<>();
 
-		TaskResponse response = new TaskResponse();
+		TaskResponse taskResponse = new TaskResponse();
 
 		List<Task> result = taskRepository.findAll();
 
 		if(result != null) {
+			taskResponse.setTasks(result);
 			String msg = responseCodeRepository.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
 			response.setIsSuccess(true);
 			response.setStatus("Success");
 			response.setMessage(msg);
-			response.setTasks(result);
+			response.setData(taskResponse);
 		}else {
 			String msg = responseCodeRepository.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
 			response.setIsSuccess(false);
@@ -85,9 +96,11 @@ public class TaskServiceImpl implements TaskService {
 	}
 
 	@Override
-	public TaskResponse filterTasks(String fromDateStr, String toDateStr, String assignedBy, String assignedTo,
-			String operation) {
-		TaskResponse response = new TaskResponse();
+	public GenericResponse<TaskResponse> filterTasks(String fromDateStr, String toDateStr, String assignedBy, String assignedTo,
+			TaskStatus status, String operation) {
+		GenericResponse<TaskResponse> response = new GenericResponse<>();
+		
+		TaskResponse taskResponse = new TaskResponse();
 
 		LocalDate fromDate = fromDateStr != null ? LocalDate.parse(fromDateStr) : null;
 		LocalDate toDate = toDateStr != null ? LocalDate.parse(toDateStr) : null;
@@ -112,16 +125,24 @@ public class TaskServiceImpl implements TaskService {
 				predicates.add(cb.equal(root.get("assignedTo"), assignedTo));
 			}
 
+			if (status != null) {
+			    predicates.add(cb.equal(root.get("status"), status));
+			}
+
+
+
+
 			return cb.and(predicates.toArray(new Predicate[0]));
 		};
 		List<Task> result = taskRepository.findAll(spec);
 
 		if(result != null) {
+			taskResponse.setTasks(result);
 			String msg = responseCodeRepository.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
 			response.setIsSuccess(true);
 			response.setStatus("Success");
 			response.setMessage(msg);
-			response.setTasks(result);
+			response.setData(taskResponse);
 		}else {
 			String msg = responseCodeRepository.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
 			response.setIsSuccess(false);
@@ -131,6 +152,103 @@ public class TaskServiceImpl implements TaskService {
 
 		return response;
 	}
+
+	@Override
+	public GenericResponse<TaskResponse> getTaskById(Long id, String operation) {
+		GenericResponse<TaskResponse> response = new GenericResponse<>();
+	    TaskResponse taskResponse = new TaskResponse();
+
+	    Optional<Task> taskOpt = taskRepository.findById(id);
+	    if (taskOpt.isPresent()) {
+	    	taskResponse.setTask(taskOpt.get());
+	        String msg = responseCodeRepository.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+	        response.setIsSuccess(true);
+	        response.setStatus("Success");
+	        response.setMessage(msg);
+	        response.setData(taskResponse);
+	        
+	    } else {
+	        String msg = responseCodeRepository.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
+	        response.setIsSuccess(false);
+	        response.setStatus("Failed");
+	        response.setMessage(msg);
+	    }
+
+	    return response;
+	}
+
+	@Override
+	public GenericResponse<TaskResponse> updateTask(Long id, Task task, String operation) {
+		GenericResponse<TaskResponse> response =  new GenericResponse<>();
+		
+		TaskResponse taskResponse = new TaskResponse();
+		
+		
+		
+		Task existingTask = taskRepository.findById(id).orElse(null);
+		
+		if(existingTask != null) {
+			
+			existingTask.setTaskName(task.getTaskName());
+			existingTask.setDescription(task.getDescription());
+			existingTask.setAssignedBy(task.getAssignedBy());
+			existingTask.setStatus(task.getStatus());
+			existingTask.setPriority(task.getPriority());
+			existingTask.setAssignedDate(task.getAssignedDate());
+			existingTask.setDueDate(task.getDueDate());
+
+		        // update assignedTo employee
+			if (task.getAssignedTo() != null && !task.getAssignedTo().isEmpty()) {
+			    existingTask.setAssignedTo(task.getAssignedTo()); // just set the name
+			}
+
+
+		        Task saved = taskRepository.save(existingTask);
+		        
+		        taskResponse.setTask(saved);
+
+		        String msg = responseCodeRepository.getMessageByCode(ResponseCode.TASK_UPDATE_SUCCESS, operation);
+		        response.setIsSuccess(true);
+		        response.setMessage(msg);
+		        response.setData(taskResponse);
+		        response.setStatus("Success");
+		        
+		} else {
+			 String msg = responseCodeRepository.getMessageByCode(ResponseCode.TASK_UPDATE_FAILED, operation);
+			 response.setIsSuccess(false);
+			 response.setMessage(msg);
+			 response.setStatus("Failed");
+		}
+		
+		return response;
+	}
+
+	@Override
+	public GenericResponse<String> deleteTaskById(Long id, String operation) {
+		
+		GenericResponse<String> response = new GenericResponse<>();
+
+        Task existingTask = taskRepository.findById(id).orElse(null);
+        if (existingTask != null) {
+            taskRepository.delete(existingTask);
+
+            String msg = responseCodeRepository.getMessageByCode(ResponseCode.TASK_DELETE_SUCCESS, operation);
+            response.setIsSuccess(true);
+            response.setMessage(msg);
+            response.setStatus("Success");
+        } else {
+            String msg = responseCodeRepository.getMessageByCode(ResponseCode.TASK_DELETE_FAILED, operation);
+            response.setIsSuccess(false);
+            response.setMessage(msg);
+            response.setStatus("Failed");
+   
+        }
+		return response;
+	}
+
+
+	 
+	
 
 
 

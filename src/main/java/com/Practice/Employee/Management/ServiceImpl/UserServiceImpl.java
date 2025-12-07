@@ -9,8 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.Practice.Employee.Management.Modal.ChangePasswordRequest;
+import com.Practice.Employee.Management.Modal.Employee;
 import com.Practice.Employee.Management.Modal.Role;
 import com.Practice.Employee.Management.Modal.Users;
+import com.Practice.Employee.Management.Repository.EmployeeRepository;
 import com.Practice.Employee.Management.Repository.ResponseCodeRespository;
 import com.Practice.Employee.Management.Repository.UserRepository;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
@@ -20,6 +22,8 @@ import com.Practice.Employee.Management.Service.UserService;
 import com.Practice.Employee.Management.utils.NotificationMessage;
 import com.Practice.Employee.Management.utils.NotificationType;
 import com.Practice.Employee.Management.utils.ResponseCode;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -31,11 +35,13 @@ public class UserServiceImpl implements UserService {
 	
 	private final PasswordEncoder passwordEncoder;
 	private NotificationService notificationService;
+	private EmployeeRepository employeeRepository;
 	
-	public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, NotificationService notificationService) {
+	public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, NotificationService notificationService, EmployeeRepository employeeRepository) {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.notificationService = notificationService;
+		this.employeeRepository = employeeRepository;
 	}
 
 	@Override
@@ -65,18 +71,35 @@ public class UserServiceImpl implements UserService {
 		
 		return response;
 	}
-
+	@Transactional
 	@Override
 	public GenericResponse updateRole(String operation, Long id, Role newRole) {
 		
 		GenericResponse response = new GenericResponse();
 		
-		Optional<Users> result = userRepository.findById(id);
+//		Optional<Users> result = userRepository.findById(id);
+		try {
+		 Optional<Employee> opt = employeeRepository.findById(id);
+		    if (opt.isEmpty()) {
+		        response.setIsSuccess(false);
+		        response.setStatus("Failed");
+		        response.setMessage("Employee not found");
+		        return response;
+		    }
 		
-		if(!result.isEmpty() || result != null) {
-		Users user = result.get();
-		user.setRole(newRole);
-		userRepository.save(user);
+		    Employee emp = opt.get();
+		    
+		    Users user = emp.getUser();
+		    if (user == null) {
+	            String msg = responseCode.getMessageByCode(ResponseCode.ROLE_UPDATE_FAILED, operation);
+	            response.setIsSuccess(false);
+	            response.setStatus("Failed");
+	            response.setMessage(msg + " - User not mapped to this employee");
+	            return response;
+	        }
+		    user.setRole(newRole);
+	        userRepository.save(user);
+		
 		
 		String notificationMsg = NotificationMessage.ROLE_CHANGE_MESSAGE.replace("{role}", newRole.toString());
 		notificationService.sendNotification(user, NotificationType.ROLE_CHANGE, notificationMsg);
@@ -85,12 +108,14 @@ public class UserServiceImpl implements UserService {
 		response.setIsSuccess(true);
 		response.setMessage(msg);
 		response.setStatus("Success");
-		} else {
+		} catch (Exception e) {
 			String msg = responseCode.getMessageByCode(ResponseCode.ROLE_UPDATE_FAILED, operation);
 			response.setIsSuccess(false);
 			response.setMessage(msg);
 			response.setStatus("Failed");
-		}
+		} 
+			
+		
 		
 		return response;
 	}

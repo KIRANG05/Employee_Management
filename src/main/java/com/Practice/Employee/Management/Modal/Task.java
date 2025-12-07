@@ -40,6 +40,9 @@ public class Task {
 	private LocalDate assignedDate = LocalDate.now();
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate dueDate;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "Task_Priority", nullable = false)
+	private TaskPriority priority;
 
 	/* if we define parameterized contsructor java dy defautl will not provide no argument
 	connstructor so we have to explicitly declre the constructor of no arguments */
@@ -122,12 +125,22 @@ public class Task {
 	public void setDueDate(LocalDate dueDate) {
 		this.dueDate = dueDate;
 	}
+	
+	
+
+	public TaskPriority getPriority() {
+		return priority;
+	}
+
+	public void setPriority(TaskPriority priority) {
+		this.priority = priority;
+	}
 
 	@Override
 	public String toString() {
 		return "Task [id=" + id + ", taskName=" + taskName + ", description=" + description + ", assignedBy="
 				+ assignedBy + ", assignedTo=" + assignedTo + ", status=" + status + ", assignedDate=" + assignedDate
-				+ ", dueDate=" + dueDate + "]";
+				+ ", dueDate=" + dueDate + ", priority=" + priority + "]";
 	}
 
 

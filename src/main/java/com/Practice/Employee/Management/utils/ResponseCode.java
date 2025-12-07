@@ -33,4 +33,8 @@ public class ResponseCode {
 	public static final String LEAVE_APPROVED_SUCCESS = "A015";
 	public static final String LEAVE_REJECT_SUCCESS = "A016";
 	public static final String LEAVE_NOT_FOUND = "E013";
+	public static final String TASK_UPDATE_SUCCESS = "A017";
+	public static final String TASK_UPDATE_FAILED = "E014";
+	public static final String TASK_DELETE_SUCCESS = "A018";
+	public static final String TASK_DELETE_FAILED = "E015";
 }

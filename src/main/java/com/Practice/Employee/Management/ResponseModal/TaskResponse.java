@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.Practice.Employee.Management.Modal.Task;
 
-public class TaskResponse extends GenericResponse {
+public class TaskResponse {
 
 	private Task task;
 	private List<Task> tasks;

@@ -8,4 +8,6 @@ import com.Practice.Employee.Management.Modal.Employee;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
+	Employee findByname(String assignedTo);
+
 }
