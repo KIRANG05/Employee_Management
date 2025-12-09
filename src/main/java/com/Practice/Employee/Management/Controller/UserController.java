@@ -32,7 +32,7 @@ public class UserController {
 		this.userService = userService;
 	}
 	
-	@PreAuthorize("hasAnyRole('ADMIN', 'HR')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
 	@GetMapping("/hrList")
 	public ResponseEntity<UserListResponse> getAllHrs(HttpServletRequest request){
 		

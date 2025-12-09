@@ -72,7 +72,7 @@ public class TaskController {
 
 	}
 
-	@PreAuthorize("hasAnyRole('ADMIN', 'HR')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
 	@GetMapping("/filter")
 	public ResponseEntity<GenericResponse<TaskResponse>> filterTasks(@RequestParam(required = false) String fromDateStr, 
 			@RequestParam(required = false) String toDateStr,
@@ -94,7 +94,7 @@ public class TaskController {
 
 	}
 
-	@PreAuthorize("hasAnyRole('ADMIN', 'HR')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
 	@GetMapping("/{id}")
 	public ResponseEntity<GenericResponse<TaskResponse>> getTaskById(@PathVariable Long id, HttpServletRequest request) {
 		String operation = request.getRequestURI();
@@ -107,6 +107,7 @@ public class TaskController {
 		}
 	}
 
+	@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
 	@PutMapping("/update/{id}")
 	public ResponseEntity<GenericResponse<TaskResponse>> updateTask(@PathVariable Long id, @RequestBody Task task,HttpServletRequest request ) {
 
@@ -120,7 +121,7 @@ public class TaskController {
 		}
 	}
 
-
+	@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<GenericResponse<String>> deleteTask(@PathVariable Long id, HttpServletRequest request) {
 		String operation = request.getRequestURI();
