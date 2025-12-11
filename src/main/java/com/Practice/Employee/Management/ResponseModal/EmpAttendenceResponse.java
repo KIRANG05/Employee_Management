@@ -2,19 +2,19 @@ package com.Practice.Employee.Management.ResponseModal;
 
 public class EmpAttendenceResponse extends AttendenceResponse {
 
-	private Long empId;
+	private Long userId;
 
-	public Long getEmpId() {
-		return empId;
+	public Long getuserId() {
+		return userId;
 	}
 
-	public void setEmpId(Long empId) {
-		this.empId = empId;
+	public void setuserId(Long userId) {
+		this.userId = userId;
 	}
 
 	@Override
 	public String toString() {
-		return "EmpAttendenceResponse [empId=" + empId + "]";
+		return "EmpAttendenceResponse [userId=" + userId + "]";
 	}
 
 }

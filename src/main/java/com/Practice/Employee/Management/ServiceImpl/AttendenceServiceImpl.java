@@ -158,7 +158,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 		
 		String notificationMsg = "You" + " " +
 		        NotificationMessage.PUNCH_OUT_MESSAGE + " " +
-		        saved.getLoginTime().format(DateTimeFormatter.ofPattern("hh:mm a"));
+		        saved.getLogoutTime().format(DateTimeFormatter.ofPattern("hh:mm a"));
 		
 		notificationService.sendNotification(user, NotificationType.ATTENDENCE, notificationMsg);
 		System.out.println("Punch in Send to save");
@@ -340,9 +340,9 @@ public class AttendenceServiceImpl implements AttendenceService {
 		 
 		 employees.forEach(emp -> {
 		        EmpAttendenceResponse empAttendenceResponse = new EmpAttendenceResponse();
-		        empAttendenceResponse.setEmpId(emp.getId());
+		        empAttendenceResponse.setuserId(emp.getUser().getId());
 
-		        Attendence attendence = attendenceRepository.findFirstByUserIdAndDate(emp.getId(), today).orElse(null);
+		        Attendence attendence = attendenceRepository.findFirstByUserIdAndDate(emp.getUser().getId(), today).orElse(null);
 
 		        if (attendence != null) {
 		        	empAttendenceResponse.setId(attendence.getId());

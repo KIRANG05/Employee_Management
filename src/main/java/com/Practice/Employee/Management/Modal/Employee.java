@@ -38,6 +38,10 @@ public class Employee {
 	
 	@Transient
 	private Role role;
+	
+	@Transient
+	private Long userId;
+
 
 	
 	public Role getRole() {
@@ -98,10 +102,18 @@ public class Employee {
 		this.salary = salary;
 	}
 
+	public Long getUserId() {
+	    return userId;
+	}
+
+	public void setUserId(Long userId) {
+	    this.userId = userId;
+	}
+	
 	@Override
 	public String toString() {
 		return "Employee [id=" + id + ", name=" + name + ", company=" + company + ", salary=" + salary
-				+ ", profileImage=" + profileImage + ", user=" + user + "]";
+				+ ", profileImage=" + profileImage + ", user=" + user + ", role=" + role + ", userId=" + userId + "]";
 	}
 	
 	

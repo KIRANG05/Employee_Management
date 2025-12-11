@@ -115,7 +115,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			Notification notification = new Notification();
 			notification.setType(NotificationType.EMPLOYEE_ADDED);
 			notification.setMessage(NotificationMessage.WELCOME_MESSAGE +", " + result.getName() + "!");
-			notification.setEmployeeId(result.getId());
+			notification.setEmployeeId(result.getUser().getId());
 			notification.setSendToEmployee(true);       // push to employee dashboard
             notification.setSendToHR(false);
             notification.setSendToAdmin(true);
@@ -177,6 +177,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			  result.forEach(emp -> {
 		            if (emp.getUser() != null) {
 		                emp.setRole(emp.getUser().getRole()); // Assuming Employee has a 'role' field (transient or not persisted)
+		                emp.setUserId(emp.getUser().getId()); 
 		            }
 		        });
 			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);

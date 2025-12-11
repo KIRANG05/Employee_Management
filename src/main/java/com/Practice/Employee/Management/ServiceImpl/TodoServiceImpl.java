@@ -1,6 +1,8 @@
 package com.Practice.Employee.Management.ServiceImpl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -55,19 +57,44 @@ public class TodoServiceImpl implements TodoService {
 
 
 	@Override
-	public GenericResponse<TodoResponse> getAllTodos(String operation, String search, String dateStr) {
+	public GenericResponse<TodoResponse> getAllTodos(String search, String dateStr, String operation) {
 		
 		  GenericResponse<TodoResponse> response = new GenericResponse<>();
 	        try {
 	        	List<Todo> todos;
-	        	  if (search != null && !search.isEmpty() && dateStr != null && !dateStr.isEmpty()) {
-	                  LocalDate date = LocalDate.parse(dateStr);
-	                  todos = todoRepository.findByTitleContainingIgnoreCaseAndCreatedAt(search, date);
-	              } else if (search != null && !search.isEmpty()) {
+	        	
+	        	 boolean hasSearch = search != null && !search.isEmpty();
+	        	    boolean hasDate = dateStr != null && !dateStr.isEmpty();
+	        	    
+	        	    LocalDateTime start = null;
+	                LocalDateTime end = null;
+	        	    
+	        	    if (hasDate) {
+	                    try {
+	                        // IMPORTANT: Match dd-MM-yyyy coming from frontend
+	                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	                        LocalDate date = LocalDate.parse(dateStr, formatter);
+
+	                          start = date.atStartOfDay();
+	                        end = date.atTime(23, 59, 59);
+
+	                    } catch (Exception e) {
+	                        throw new IllegalArgumentException("Invalid date format. Expected dd-MM-yyyy");
+	                    }
+	                }
+	        	    
+	        	  if (hasSearch && hasDate) {
+//	                  LocalDate date = LocalDate.parse(dateStr);
+//	                  LocalDateTime start = date.atStartOfDay();
+//	                  LocalDateTime end = date.atTime(23, 59, 59);
+	                  todos = todoRepository.findByTitleContainingIgnoreCaseAndCreatedAtBetween(search, start, end);
+	              } else if (hasSearch) {
 	                  todos = todoRepository.findByTitleContainingIgnoreCase(search);
-	              } else if (dateStr != null && !dateStr.isEmpty()) {
-	                  LocalDate date = LocalDate.parse(dateStr);
-	                  todos = todoRepository.findByCreatedAt(date);
+	              } else if (hasDate) {
+//	                  LocalDate date = LocalDate.parse(dateStr);
+//	                  LocalDateTime start = date.atStartOfDay();
+//	                  LocalDateTime end = date.atTime(23, 59, 59);
+	                  todos = todoRepository.findByCreatedAtBetween(start, end);
 	              } else {
 	                  todos = todoRepository.findAll();
 	              }

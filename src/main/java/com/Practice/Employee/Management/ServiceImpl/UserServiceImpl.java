@@ -71,6 +71,57 @@ public class UserServiceImpl implements UserService {
 		
 		return response;
 	}
+	
+//	@Transactional
+//	@Override
+//	public GenericResponse updateRole(String operation, Long id, Role newRole) {
+//		
+//		GenericResponse response = new GenericResponse();
+//		
+////		Optional<Users> result = userRepository.findById(id);
+//		try {
+//		 Optional<Employee> opt = employeeRepository.findById(id);
+//		    if (opt.isEmpty()) {
+//		        response.setIsSuccess(false);
+//		        response.setStatus("Failed");
+//		        response.setMessage("Employee not found");
+//		        return response;
+//		    }
+//		
+//		    Employee emp = opt.get();
+//		    
+//		    Users user = emp.getUser();
+//		    if (user == null) {
+//	            String msg = responseCode.getMessageByCode(ResponseCode.ROLE_UPDATE_FAILED, operation);
+//	            response.setIsSuccess(false);
+//	            response.setStatus("Failed");
+//	            response.setMessage(msg + " - User not mapped to this employee");
+//	            return response;
+//	        }
+//		    user.setRole(newRole);
+//	        userRepository.save(user);
+//		
+//		
+//		String notificationMsg = NotificationMessage.ROLE_CHANGE_MESSAGE.replace("{role}", newRole.toString());
+//		notificationService.sendNotification(user, NotificationType.ROLE_CHANGE, notificationMsg);
+//		
+//		String msg = responseCode.getMessageByCode(ResponseCode.ROLE_UPDATE_SUCCESS, operation);
+//		response.setIsSuccess(true);
+//		response.setMessage(msg);
+//		response.setStatus("Success");
+//		} catch (Exception e) {
+//			String msg = responseCode.getMessageByCode(ResponseCode.ROLE_UPDATE_FAILED, operation);
+//			response.setIsSuccess(false);
+//			response.setMessage(msg);
+//			response.setStatus("Failed");
+//		} 
+//			
+//		
+//		
+//		return response;
+//	}
+
+	
 	@Transactional
 	@Override
 	public GenericResponse updateRole(String operation, Long id, Role newRole) {
@@ -119,7 +170,7 @@ public class UserServiceImpl implements UserService {
 		
 		return response;
 	}
-
+	
 	@Override
 	public GenericResponse changePassword(ChangePasswordRequest passwordRequest, String username, String operation) {
 	

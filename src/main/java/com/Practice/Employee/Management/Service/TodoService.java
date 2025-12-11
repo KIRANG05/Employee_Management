@@ -10,7 +10,7 @@ public interface TodoService {
 
 	GenericResponse<TodoResponse> addTodo(Todo todo, String operation);
 
-	GenericResponse<TodoResponse> getAllTodos(String operation, String date, String operation2);
+	GenericResponse<TodoResponse> getAllTodos(String search, String date, String operation);
 
 	GenericResponse<TodoResponse> getTodoById(Long id, String operation);
 
