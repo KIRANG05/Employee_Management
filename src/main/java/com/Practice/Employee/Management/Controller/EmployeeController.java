@@ -195,5 +195,26 @@ public class EmployeeController {
 					.body(response);
 		}
 	}
+	
+	@PreAuthorize("hasAnyRole('ADMIN','HR','EMPLOYEE')")
+	@GetMapping("/reportees")
+//	@Operation(
+//	        summary = "Get All Employees",
+//	        description = "Fetches the list of all employees. Accessible by ADMIN, HR, and EMPLOYEE roles."
+//	    )
+	public ResponseEntity<EmployeeResponse> getAllReportees(HttpServletRequest request) {
+		
+		String operation = request.getRequestURI();
+		EmployeeResponse response = employeeService.findAllReportees(operation);
+		if (response.getIsSuccess()) {
+			return ResponseEntity
+					.status(HttpStatus.OK)
+					.body(response);
+		} else {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(response); 
+		}
+	}
 
 }

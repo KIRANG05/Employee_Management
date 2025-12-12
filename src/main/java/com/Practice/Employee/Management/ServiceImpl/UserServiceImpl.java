@@ -128,19 +128,20 @@ public class UserServiceImpl implements UserService {
 		
 		GenericResponse response = new GenericResponse();
 		
-//		Optional<Users> result = userRepository.findById(id);
+		
 		try {
-		 Optional<Employee> opt = employeeRepository.findById(id);
-		    if (opt.isEmpty()) {
+//		 Optional<Employee> opt = employeeRepository.findById(id);
+			Optional<Users> result = userRepository.findById(id);
+		    if (result.isEmpty()) {
 		        response.setIsSuccess(false);
 		        response.setStatus("Failed");
-		        response.setMessage("Employee not found");
+		        response.setMessage("User not found");
 		        return response;
 		    }
 		
-		    Employee emp = opt.get();
+//		    Employee emp = opt.get();
 		    
-		    Users user = emp.getUser();
+		    Users user = result.get();
 		    if (user == null) {
 	            String msg = responseCode.getMessageByCode(ResponseCode.ROLE_UPDATE_FAILED, operation);
 	            response.setIsSuccess(false);

@@ -346,4 +346,52 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return response;
 	}
 	
+	@Override
+	public EmployeeResponse findAllReportees(String operation) {
+		logger.info("FindAll Operation Initiated");
+		
+		EmployeeResponse response = new EmployeeResponse();
+		try {
+		List<Employee> allEmployees = employeeRepository.findAll();
+		
+		List<Employee> result = allEmployees.stream()
+		        .filter(emp -> {
+		            if (emp.getUser() == null) return false;
+		            Role role = emp.getUser().getRole();
+		            return role == Role.ROLE_EMPLOYEE;
+		                
+		        })
+		        .peek(emp -> {
+		            emp.setRole(emp.getUser().getRole());
+		            emp.setUserId(emp.getUser().getId());
+		        })
+		        .toList();
+
+//		if (result != null) {
+//			
+//			  result.forEach(emp -> {
+//		            if (emp.getUser() != null) {
+//		                emp.setRole(emp.getUser().getRole()); // Assuming Employee has a 'role' field (transient or not persisted)
+//		                emp.setUserId(emp.getUser().getId()); 
+//		            }
+//		        });
+			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+			response.setStatus("Success");
+			response.setIsSuccess(true);
+			response.setMessage(msg);
+			response.setEmployees(result);
+			
+			logger.info("FindAll Successful — Total Employees Found: {}", result.size());
+		} catch (Exception e) {
+			String msg = responseCode.getMessageByCode(ResponseCode.GENERIC_FAIL, operation);
+			response.setStatus("Failed");
+			response.setIsSuccess(false);
+			response.setMessage(msg);
+//			response.setEmployees(result);
+			
+			logger.error("FindAll Failed — No Employees Found. Operation: {}", operation);
+		} 
+			return response;
+	}
+	
 }

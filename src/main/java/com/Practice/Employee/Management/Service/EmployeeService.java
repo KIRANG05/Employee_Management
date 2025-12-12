@@ -24,6 +24,8 @@ public interface EmployeeService {
 
 	GenericResponse deleteById(Long id, String operation);
 
+	EmployeeResponse findAllReportees(String operation);
+
 
 
 }
