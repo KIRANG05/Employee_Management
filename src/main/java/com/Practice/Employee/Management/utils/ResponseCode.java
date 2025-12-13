@@ -43,4 +43,8 @@ public class ResponseCode {
 	public static final String TODO_UPDATE_FAILED = "E017";
 	public static final String TODO_DELETE_SUCCESS = "A021";
 	public static final String TODO_DELETE_FAILED = "E018";
+	public static final String USER_DELETE_SUCCESS = "A022";
+	public static final String USER_DELETE_FAILED = "E019";
+	public static final String USER_UPDATE_SUCCESS = "A023";
+	public static final String USER_UPDATE_FAILED = "E020";
 }
