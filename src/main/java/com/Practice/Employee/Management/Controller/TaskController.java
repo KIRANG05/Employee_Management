@@ -1,5 +1,7 @@
 package com.Practice.Employee.Management.Controller;
 
+import java.security.Principal;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -109,10 +111,10 @@ public class TaskController {
 
 	@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
 	@PutMapping("/update/{id}")
-	public ResponseEntity<GenericResponse<TaskResponse>> updateTask(@PathVariable Long id, @RequestBody Task task,HttpServletRequest request ) {
+	public ResponseEntity<GenericResponse<TaskResponse>> updateTask(@PathVariable Long id, @RequestBody Task task, Principal principal,HttpServletRequest request ) {
 
 		String operation = request.getRequestURI();
-		GenericResponse<TaskResponse> response = taskService.updateTask(id, task, operation);
+		GenericResponse<TaskResponse> response = taskService.updateTask(id, task, principal, operation);
 
 		if (response.getIsSuccess()) {
 			return ResponseEntity.status(HttpStatus.OK).body(response);

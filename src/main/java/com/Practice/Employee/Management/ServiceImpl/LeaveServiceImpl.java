@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.Practice.Employee.Management.Modal.LeaveRequest;
 import com.Practice.Employee.Management.Modal.LeaveStatus;
+import com.Practice.Employee.Management.Modal.Notification;
 import com.Practice.Employee.Management.Modal.Role;
 import com.Practice.Employee.Management.Modal.Users;
 import com.Practice.Employee.Management.Repository.LeaveRepository;
@@ -19,6 +20,8 @@ import com.Practice.Employee.Management.Repository.UserRepository;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.ResponseModal.LeaveResponse;
 import com.Practice.Employee.Management.Service.LeaveService;
+import com.Practice.Employee.Management.Service.NotificationService;
+import com.Practice.Employee.Management.utils.NotificationType;
 import com.Practice.Employee.Management.utils.ResponseCode;
 
 @Service
@@ -30,12 +33,15 @@ public class LeaveServiceImpl implements LeaveService {
 	private ResponseCodeRespository responseCodeRespository;
 	
 	private UserRepository userRepository;
+	private NotificationService notificationService;
 	
-	public LeaveServiceImpl(LeaveRepository leaveRepository,UserRepository userRepository, ResponseCodeRespository responseCodeRepository ) {
+	public LeaveServiceImpl(LeaveRepository leaveRepository,UserRepository userRepository, ResponseCodeRespository responseCodeRepository, 
+			NotificationService notificationService) {
 		
 		this.leaveRepository = leaveRepository;
 		this.userRepository = userRepository;
 		this.responseCodeRespository = responseCodeRepository;
+		this.notificationService = notificationService;
 	}
 	
 
@@ -85,6 +91,35 @@ public class LeaveServiceImpl implements LeaveService {
 	        response.setStatus("Success");
 	        response.setMessage(msg);
 	        response.setData(leaveResponse);
+	        
+	        if (savedLeave.getStatus() == LeaveStatus.PENDING) {
+	            // Notify all HRs
+	            List<Users> hrList = userRepository.findByRole(Role.ROLE_HR); // assuming you have multiple HRs
+	            for (Users hr : hrList) {
+	                Notification hrNotification = new Notification();
+	                hrNotification.setType(NotificationType.LEAVE_REQUEST);
+	                hrNotification.setMessage("New leave request from " + user.getUsername());
+	                hrNotification.setHrId(hr.getId());
+	                hrNotification.setSendToHR(true);
+	                hrNotification.setSendToAdmin(false);
+	                hrNotification.setSendToEmployee(false);
+
+	                notificationService.saveNotification(hrNotification);
+	            }
+
+	            // Notify admin (single)
+	            Users admin = userRepository.findByRole(Role.ROLE_ADMIN).stream().findFirst().orElse(null);
+	            if (admin != null) {
+	                Notification adminNotification = new Notification();
+	                adminNotification.setType(NotificationType.LEAVE_REQUEST);
+	                adminNotification.setMessage("New leave request from " + user.getUsername());
+	                adminNotification.setSendToAdmin(true);
+	                adminNotification.setSendToHR(false);
+	                adminNotification.setSendToEmployee(false);
+
+	                notificationService.saveNotification(adminNotification);
+	            }
+	        }
 			
 			
 		} else {
@@ -208,8 +243,31 @@ public class LeaveServiceImpl implements LeaveService {
 
 	        
 	        response.setIsSuccess(true);
+	        response.setStatus("Success");
 	        response.setMessage(msg);
 	        response.setData(leaveResponse);
+	        
+	        Notification empNotification = new Notification();
+	        empNotification.setType(NotificationType.LEAVE_STATUS_UPDATED);
+	        empNotification.setMessage("Your leave request from " +
+	                saved.getFromDate() + " to " + saved.getToDate() +
+	                " has been " + saved.getStatus());
+	        empNotification.setEmployeeId(saved.getEmployee().getId());
+	        empNotification.setSendToEmployee(true);
+	        empNotification.setSendToHR(false);
+	        empNotification.setSendToAdmin(false);
+
+	        notificationService.saveNotification(empNotification);
+	        
+	        Notification adminNotification = new Notification();
+	        adminNotification.setType(NotificationType.LEAVE_STATUS_UPDATED);
+	        adminNotification.setMessage("HR has " + saved.getStatus() + " leave for " +
+	                saved.getEmployee().getUsername() + " from " +
+	                saved.getFromDate() + " to " + saved.getToDate());
+	        adminNotification.setSendToEmployee(false);
+	        adminNotification.setSendToAdmin(true);
+	        adminNotification.setSendToHR(false);
+	        notificationService.saveNotification(adminNotification);
 		
 		return response;
 	}

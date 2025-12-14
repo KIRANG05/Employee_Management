@@ -137,7 +137,7 @@ public class UserController {
 	
 	
 	@GetMapping("/allUsers")
-	@PreAuthorize("hasAnyRole('ADMIN','HR')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
 	public ResponseEntity<UserListResponse> allUsers(HttpServletRequest request){
 		
 		String operation = request.getRequestURI();
@@ -156,7 +156,7 @@ public class UserController {
 		
 	}
 	
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
 	@GetMapping("/admin/allUsers")
 	public ResponseEntity<GenericResponse<List<AdminUserResponse>>> getAllUsers(
 	        HttpServletRequest request) {
@@ -177,7 +177,7 @@ public class UserController {
 		}
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
 	@GetMapping("/admin/{userId}")
 	public ResponseEntity<GenericResponse<AdminUserResponse>> getUserForAdmin(
 	        @PathVariable Long userId,
@@ -198,7 +198,7 @@ public class UserController {
 		}
 	}
 	
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
 	@PutMapping("/userUpdateById/{id}")
 	@Operation(
 	        summary = "Update Employee By ID (Full Update)",
@@ -222,8 +222,8 @@ public class UserController {
 		}
 	}
 	
-	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping("/deleteByUserId/{userId}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EMPLOYEE')")
+	@DeleteMapping("/{userId}")
 	@Operation(
 	        summary = "Delete User (and Employee if exists)",
 	        description = "Deletes a user by userId. If an employee profile exists, it deletes both. ADMIN only."

@@ -1,5 +1,7 @@
 package com.Practice.Employee.Management.Service;
 
+import java.security.Principal;
+
 import com.Practice.Employee.Management.Modal.Task;
 import com.Practice.Employee.Management.Modal.TaskStatus;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
@@ -18,8 +20,10 @@ public interface TaskService {
 
 	GenericResponse<TaskResponse> getTaskById(Long id, String operation);
 
-	GenericResponse<TaskResponse> updateTask(Long id, Task task, String operation);
+//	GenericResponse<TaskResponse> updateTask(Long id, Task task, String operation);
 
 	GenericResponse<String> deleteTaskById(Long id, String operation);
+
+	GenericResponse<TaskResponse> updateTask(Long id, Task task, Principal principal, String operation);
 
 }

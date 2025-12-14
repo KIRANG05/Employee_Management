@@ -47,4 +47,5 @@ public class ResponseCode {
 	public static final String USER_DELETE_FAILED = "E019";
 	public static final String USER_UPDATE_SUCCESS = "A023";
 	public static final String USER_UPDATE_FAILED = "E020";
+	public static final String TASK_STATUS_UPDATE_SUCCESS = "A024";
 }

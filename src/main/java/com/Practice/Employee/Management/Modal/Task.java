@@ -43,6 +43,12 @@ public class Task {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "Task_Priority", nullable = false)
 	private TaskPriority priority;
+	
+	  @Column(name = "assigned_by_user_id")
+	    private Long assignedByUserId;
+
+	    @Column(name = "assigned_to_user_id")
+	    private Long assignedToUserId;
 
 	/* if we define parameterized contsructor java dy defautl will not provide no argument
 	connstructor so we have to explicitly declre the constructor of no arguments */
@@ -136,11 +142,29 @@ public class Task {
 		this.priority = priority;
 	}
 
+	
+	public Long getAssignedByUserId() {
+		return assignedByUserId;
+	}
+
+	public void setAssignedByUserId(Long assignedByUserId) {
+		this.assignedByUserId = assignedByUserId;
+	}
+
+	public Long getAssignedToUserId() {
+		return assignedToUserId;
+	}
+
+	public void setAssignedToUserId(Long assignedToUserId) {
+		this.assignedToUserId = assignedToUserId;
+	}
+
 	@Override
 	public String toString() {
 		return "Task [id=" + id + ", taskName=" + taskName + ", description=" + description + ", assignedBy="
 				+ assignedBy + ", assignedTo=" + assignedTo + ", status=" + status + ", assignedDate=" + assignedDate
-				+ ", dueDate=" + dueDate + ", priority=" + priority + "]";
+				+ ", dueDate=" + dueDate + ", priority=" + priority + ", assignedByUserId=" + assignedByUserId
+				+ ", assignedToUserId=" + assignedToUserId + "]";
 	}
 
 

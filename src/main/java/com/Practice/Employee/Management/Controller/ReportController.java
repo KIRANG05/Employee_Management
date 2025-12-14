@@ -25,7 +25,7 @@ public class ReportController {
 	}
 	
 	
-	@PreAuthorize("hasAnyRole('ADMIN','HR')")
+	@PreAuthorize("hasAnyRole('ADMIN','HR,'EMPLOYEE'')")
 	@GetMapping("/taskSummary")
 	public ResponseEntity<ReportResponse> getTaskSummary(HttpServletRequest request) {
 		
@@ -44,7 +44,7 @@ public class ReportController {
 		
 	}
 	
-	@PreAuthorize("hasAnyRole('HR', 'ADMIN')")
+	@PreAuthorize("hasAnyRole('HR', 'ADMIN','EMPLOYEE')")
 	@GetMapping("/taskSummaryByEmployee")
 	public ResponseEntity<ReportResponse> getTaskSummaryByEmployee(@RequestParam String employeeName, HttpServletRequest requset){
 		
