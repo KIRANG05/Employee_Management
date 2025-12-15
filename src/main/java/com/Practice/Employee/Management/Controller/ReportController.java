@@ -63,5 +63,19 @@ public class ReportController {
 		}
 		
 	}
+	
+	@PreAuthorize("hasRole('HR')")
+	@GetMapping("/taskSummaryByHr")
+	public ResponseEntity<ReportResponse> getTaskSummaryByHr(@RequestParam String hrName, HttpServletRequest request) {
+	    String operation = request.getRequestURI();
+	    ReportResponse response = reportService.getTaskSummaryByHr(hrName, operation);
+
+	    if (response.getIsSuccess()) {
+	        return ResponseEntity.status(HttpStatus.OK).body(response);
+	    } else {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	    }
+	}
+
 
 }

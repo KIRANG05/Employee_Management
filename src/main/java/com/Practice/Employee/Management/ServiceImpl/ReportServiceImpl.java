@@ -1,6 +1,7 @@
 package com.Practice.Employee.Management.ServiceImpl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
@@ -78,6 +79,46 @@ public class ReportServiceImpl implements ReportService {
 		}
 		
 		return response;
+	}
+
+	
+	@Override
+	public ReportResponse getTaskSummaryByHr(String hrName, String operation) {
+	    ReportResponse response = new ReportResponse();
+	    
+	    try {
+	        Long totalTasks = taskRepository.countByAssignedBy(hrName);
+	        Long completedTasks = taskRepository.countByAssignedByAndStatus(hrName, TaskStatus.COMPLETED);
+	        Long pendingTasks = taskRepository.countByAssignedByAndStatus(hrName, TaskStatus.PENDING);
+	        Long overDueTasks = taskRepository.countOverdueByAssignedBy(hrName, LocalDate.now(), TaskStatus.COMPLETED);
+	        System.out.println("HR Name: " + hrName + ", Today: " + LocalDate.now());
+	        Long tasksAssignedToday = taskRepository.countByAssignedByAndAssignedDate(hrName, LocalDate.now());
+	        System.out.println("Tasks assigned today: " + tasksAssignedToday);
+	        
+//	        LocalDate today = LocalDate.now();
+//	        LocalDateTime startOfDay = today.atStartOfDay();
+//	        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+//	        Long tasksAssignedToday = taskRepository.countByAssignedByAndAssignedDate(hrName, startOfDay, endOfDay);
+
+
+	        String msg = responseCodeRepository.getMessageByCode(ResponseCode.GENERIC_SUCCESS, operation);
+
+	        response.setIsSuccess(true);
+	        response.setMessage(msg);
+	        response.setStatus("Success");
+	        response.setTotalTasks(totalTasks);
+	        response.setCompletedTasks(completedTasks);
+	        response.setPendingTasks(pendingTasks);
+	        response.setOverDueTasks(overDueTasks);
+	        response.setTaskAssignedToday(tasksAssignedToday);
+
+	    } catch (Exception e) {
+	        response.setIsSuccess(false);
+	        response.setMessage(responseCodeRepository.getMessageByCode(ResponseCode.GENERIC_FAIL, operation));
+	        response.setStatus("Failed");
+	    }
+
+	    return response;
 	}
 
 }

@@ -6,16 +6,18 @@ public class ReportResponse extends GenericResponse {
 	private Long completedTasks;
 	private Long pendingTasks;
 	private Long overDueTasks;
+	private Long taskAssignedToday;
 	
 	public ReportResponse() {
 		
 	}
 
-	public ReportResponse(Long totalTasks, Long completedTasks, Long pendingTasks, Long overDueTasks) {
+	public ReportResponse(Long totalTasks, Long completedTasks, Long pendingTasks, Long overDueTasks, Long taskAssignedToday) {
 		this.totalTasks = totalTasks;
 		this.completedTasks = completedTasks;
 		this.pendingTasks = pendingTasks;
 		this.overDueTasks = overDueTasks;
+		this.taskAssignedToday = taskAssignedToday;
 		
 	}
 
@@ -51,10 +53,20 @@ public class ReportResponse extends GenericResponse {
 		this.overDueTasks = overDueTasks;
 	}
 
+	
+	
+	public Long getTaskAssignedToday() {
+		return taskAssignedToday;
+	}
+
+	public void setTaskAssignedToday(Long taskAssignedToday) {
+		this.taskAssignedToday = taskAssignedToday;
+	}
+
 	@Override
 	public String toString() {
 		return "ReportResponse [totalTasks=" + totalTasks + ", completedTasks=" + completedTasks + ", pendingTasks="
-				+ pendingTasks + ", overDueTasks=" + overDueTasks + "]";
+				+ pendingTasks + ", overDueTasks=" + overDueTasks + ", taskAssignedToday=" + taskAssignedToday + "]";
 	}
 	
 	

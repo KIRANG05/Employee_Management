@@ -25,5 +25,30 @@ public interface TaskRespository extends JpaRepository<Task, Long>, JpaSpecifica
 	@Query("SELECT COUNT(t) FROM Task t WHERE t.assignedTo = :assignedTo AND t.dueDate < :today AND t.status <> :completedStatus")
 	Long countOverdueByEmployee(@Param("assignedTo") String assignedTo, @Param("today")LocalDate today, @Param("completedStatus") TaskStatus completedStatus);
 
+	Long countByStatus(String string);
+
+	Long countByAssignedDate(LocalDate assignedDate);
+
+	
+	@Query("""
+		       SELECT COUNT(t)
+		       FROM Task t
+		       WHERE t.dueDate < :today
+		       AND t.status <> :completedStatus
+		       """)
+		Long countOverDueTasks(@Param("today") LocalDate today, @Param("completedStatus") TaskStatus completedStatus);
+
+	Long countByAssignedBy(String hrName);
+
+	Long countByAssignedByAndStatus(String hrName, TaskStatus completed);
+
+	 @Query("SELECT COUNT(t) FROM Task t WHERE t.assignedBy = :hrName AND t.dueDate < :today AND t.status <> :completedStatus")
+	    Long countOverdueByAssignedBy(@Param("hrName") String hrName,
+	                                  @Param("today") LocalDate today,
+	                                  @Param("completedStatus") TaskStatus completedStatus);
+
+	 Long countByAssignedByAndAssignedDate(String hrName, LocalDate now);
+
+
 
 }

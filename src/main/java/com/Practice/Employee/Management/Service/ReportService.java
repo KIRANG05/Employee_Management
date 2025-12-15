@@ -8,4 +8,6 @@ public interface ReportService {
 
 	ReportResponse getTaskSummaryByEmployee(String employeeName, String operation);
 
+	ReportResponse getTaskSummaryByHr(String hrName, String operation);
+
 }
