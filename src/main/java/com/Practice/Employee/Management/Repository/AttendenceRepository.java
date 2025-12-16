@@ -31,4 +31,13 @@ public interface AttendenceRepository extends JpaRepository<Attendence, Long>{
 	List<Attendence> findAllByUserMonth(Long userId, int year, int month);
 
 
+	
+	@Query("""
+			SELECT COUNT(a)
+			FROM Attendence a
+			WHERE DATE(a.loginTime) = CURRENT_DATE
+			""")
+	long countTodayAttendance();
+
+
 }
