@@ -16,7 +16,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.Practice.Employee.Management.Modal.Employee;
 import com.Practice.Employee.Management.ResponseModal.EmployeeResponse;
@@ -68,11 +70,35 @@ public class EmployeeControllerTest {
 		response.setMessage("Employee Add Success");
 		response.setEmployee(employee);
 		
-		Mockito.when(employeeService.save(Mockito.any(Employee.class), Mockito.eq("/employee/add")))
-			   .thenReturn(response);
+//		Mockito.when(employeeService.save(Mockito.any(Employee.class), Mockito.eq("/employee/add")))
+//			   .thenReturn(response);
 		
-		 mockMvc.perform(post("/employee/add")
-		            .contentType(MediaType.APPLICATION_JSON)
+		Mockito.when(employeeService.save(
+	            Mockito.any(Employee.class),
+	            Mockito.any(MultipartFile.class),
+	            Mockito.anyString()
+	    )).thenReturn(response);
+		
+		String employeeJson = objectMapper.writeValueAsString(employee);
+		
+		  MockMultipartFile employeePart = new MockMultipartFile(
+		            "employee",
+		            "employee.json",
+		            "application/json",
+		            employeeJson.getBytes()
+		    );
+		  
+		  MockMultipartFile imagePart = new MockMultipartFile(
+		            "image",
+		            "profile.png",
+		            "image/png",
+		            "dummy-image-content".getBytes()
+		    );
+		
+		 mockMvc.perform(multipart("/employee/add")
+				 .file(employeePart)
+				 .file(imagePart)
+		            .contentType(MediaType.MULTIPART_FORM_DATA)
 		            .content(objectMapper.writeValueAsString(employee)))
 		            .andExpect(status().isCreated())
 		            .andExpect(jsonPath("$.isSuccess").value(true))
@@ -98,12 +124,37 @@ public class EmployeeControllerTest {
 		response.setStatus("Failed");
 		response.setMessage("Employee Add Failed");
 		response.setEmployee(null);
+//		
+//		Mockito.when(employeeService.save(Mockito.any(Employee.class), Mockito.eq("/employee/add")))
+//			   .thenReturn(response);
 		
-		Mockito.when(employeeService.save(Mockito.any(Employee.class), Mockito.eq("/employee/add")))
-			   .thenReturn(response);
+		  Mockito.when(employeeService.save(
+		            Mockito.any(Employee.class),
+		            Mockito.any(MultipartFile.class),
+		            Mockito.anyString()
+		    )).thenReturn(response);
+		  
+		  String employeeJson = objectMapper.writeValueAsString(employee);
+
+		    MockMultipartFile employeePart = new MockMultipartFile(
+		            "employee",
+		            "employee.json",
+		            "application/json",
+		            employeeJson.getBytes()
+		    );
+
+		    // Optional: mock an image file
+		    MockMultipartFile imagePart = new MockMultipartFile(
+		            "image",
+		            "profile.png",
+		            "image/png",
+		            "dummy-image-content".getBytes()
+		    );
 		
-		 mockMvc.perform(post("/employee/add")
-		            .contentType(MediaType.APPLICATION_JSON)
+		 mockMvc.perform(multipart("/employee/add")
+				 .file(employeePart)
+                 .file(imagePart)
+		            .contentType(MediaType.MULTIPART_FORM_DATA)
 		            .content(objectMapper.writeValueAsString(employee)))
 		            .andExpect(status().isBadRequest())
 		            .andExpect(jsonPath("$.isSuccess").value(false))

@@ -6,6 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
@@ -14,10 +16,14 @@ import java.util.List;
 import java.util.Optional;
 
 import com.Practice.Employee.Management.Modal.Employee;
+import com.Practice.Employee.Management.Modal.Notification;
+import com.Practice.Employee.Management.Modal.Users;
 import com.Practice.Employee.Management.Repository.EmployeeRepository;
 import com.Practice.Employee.Management.Repository.ResponseCodeRespository;
+import com.Practice.Employee.Management.Repository.UserRepository;
 import com.Practice.Employee.Management.ResponseModal.EmployeeResponse;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
+import com.Practice.Employee.Management.Service.NotificationService;
 import com.Practice.Employee.Management.utils.ResponseCode;
 
 import jakarta.validation.constraints.AssertTrue;
@@ -32,7 +38,16 @@ public class EmployeeServiceImplTest {
 	private EmployeeRepository employeeRepository;
 	
 	@Mock
+	private UserRepository userRepository;
+	
+	@Mock
 	private ResponseCodeRespository responseCode;
+	
+	@Mock
+	private PasswordEncoder passwordEncoder;
+	
+	 @Mock
+	 private NotificationService notificationService; 
 	
 	@Test
 	void testEmployeeSaveSuccess() {
@@ -41,15 +56,30 @@ public class EmployeeServiceImplTest {
 		employee.setId(1L);
 		employee.setName("Manoj");
 		
-		String opeartion = "CREATE";
+		String operation = "/employee/add";
+//		
+//		Mockito.when(employeeRepository.save(employee))
+//			   .thenReturn(employee);
+//		Mockito.when(responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_SUCCESS, opeartion))
+//			   .thenReturn("Employee Save Success");
 		
-		Mockito.when(employeeRepository.save(employee))
-			   .thenReturn(employee);
-		Mockito.when(responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_SUCCESS, opeartion))
-			   .thenReturn("Employee Save Success");
+		 Mockito.when(userRepository.existsByUsername(Mockito.anyString())).thenReturn(false);
+		    Mockito.when(userRepository.save(Mockito.any(Users.class))).thenAnswer(i -> i.getArgument(0));
+		
+		    // Mock employee repository
+		    Mockito.when(employeeRepository.save(Mockito.any(Employee.class))).thenAnswer(i -> i.getArgument(0));
+		    
+		    // Mock response code
+		    Mockito.when(responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_SUCCESS, operation))
+		           .thenReturn("Employee Save Success");
+		    
+		    // Mock password encoder
+		    Mockito.when(passwordEncoder.encode(Mockito.anyString())).thenReturn("encodedPassword");
+		    
+		    Mockito.doNothing().when(notificationService).saveNotification(Mockito.any(Notification.class));
 		
 		//This will call Actual Logic of save which is inside the ServiceImpl class then it will call repo but this will call modk repo that will return values 
-		EmployeeResponse response = employeeService.save(employee, opeartion);
+		EmployeeResponse response = employeeService.save(employee, null, operation);
 		
 		assertTrue(response.getIsSuccess());
 		assertEquals("Success",response.getStatus());
@@ -57,10 +87,39 @@ public class EmployeeServiceImplTest {
 		assertNotNull(response.getEmployee());
 		assertEquals("Employee Save Success", response.getMessage());
 		
-		verify(employeeRepository).save(employee);
-		verify(responseCode).getMessageByCode(ResponseCode.EMPLOYEE_ADD_SUCCESS, opeartion);
+		 verify(userRepository).save(Mockito.any(Users.class));
+		verify(employeeRepository).save(Mockito.any(Employee.class));
+		verify(responseCode).getMessageByCode(ResponseCode.EMPLOYEE_ADD_SUCCESS, operation);
+		verify(notificationService).saveNotification(Mockito.any(Notification.class));
 		
 	}
+	
+	
+	
+	@Test
+	void testEmployeeSaveFailure_UsernameExists() throws Exception {
+	    Employee employee = new Employee();
+	    employee.setName("Sharavana");
+
+	    String operation = "/employee/add";
+
+	    // Mock username exists scenario
+	    Mockito.when(userRepository.existsByUsername(Mockito.anyString())).thenReturn(true);
+	    Mockito.when(responseCode.getMessageByCode(ResponseCode.USERNAME_ALREADY_EXISTS, operation))
+	           .thenReturn("Username already exists");
+
+	    EmployeeResponse response = employeeService.save(employee, null, operation);
+
+	    assertFalse(response.getIsSuccess());
+	    assertEquals("Failed", response.getStatus());
+	    assertEquals("Username already exists", response.getMessage());
+	    assertNull(response.getEmployee());
+
+	    verify(userRepository, Mockito.never()).save(Mockito.any(Users.class));
+	    verify(employeeRepository, Mockito.never()).save(Mockito.any(Employee.class));
+	    verify(responseCode).getMessageByCode(ResponseCode.USERNAME_ALREADY_EXISTS, operation);
+	}
+
 	
 	@Test
 	void testEmployeeSaveFailure() {
@@ -68,20 +127,30 @@ public class EmployeeServiceImplTest {
 		Employee employee = new Employee();
 		employee.setName("Sharavana");
 		
-		String operation = "CREATE";
+		 String operation = "/employee/add";
+//		
+//		Mockito.when(employeeRepository.save(employee))
+//			   .thenReturn(null);
+//		Mockito.when(responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_FAILED, operation))
+//			   .thenReturn("Employee Save Failed");
+		 
+		    // Mock username does not exist
+		    Mockito.when(userRepository.existsByUsername(Mockito.anyString())).thenReturn(false);
+		    Mockito.when(userRepository.save(Mockito.any(Users.class))).thenAnswer(i -> i.getArgument(0));
+		    
+		    // Mock employee repository returning null
+		    Mockito.when(employeeRepository.save(Mockito.any(Employee.class))).thenReturn(null);
+		    Mockito.when(responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_FAILED, operation))
+		           .thenReturn("Employee Save Failed");
 		
-		Mockito.when(employeeRepository.save(employee))
-			   .thenReturn(null);
-		Mockito.when(responseCode.getMessageByCode(ResponseCode.EMPLOYEE_ADD_FAILED, operation))
-			   .thenReturn("Employee Save Failed");
-		
-		EmployeeResponse response = employeeService.save(employee, operation);
+		EmployeeResponse response = employeeService.save(employee, null, operation);
 		assertFalse(response.getIsSuccess());
 		assertNull(response.getEmployee());
 		assertEquals("Failed", response.getStatus());
 		assertEquals("Employee Save Failed", response.getMessage());
 		
-		verify(employeeRepository).save(employee);//verify(mock).method(args)
+		verify(userRepository).save(Mockito.any(Users.class));
+		verify(employeeRepository).save(Mockito.any(Employee.class));//verify(mock).method(args)
 		verify(responseCode).getMessageByCode(ResponseCode.EMPLOYEE_ADD_FAILED, operation);
 		
 	}
