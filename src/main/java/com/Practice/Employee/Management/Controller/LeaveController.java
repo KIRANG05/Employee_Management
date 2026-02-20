@@ -21,10 +21,12 @@ import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.ResponseModal.LeaveResponse;
 import com.Practice.Employee.Management.Service.LeaveService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/leaves")
+@SecurityRequirement(name = "BearerAuth")
 public class LeaveController {
 	
 	@Autowired

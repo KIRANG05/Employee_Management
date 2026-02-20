@@ -21,10 +21,13 @@ import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.TaskService;
 import com.Practice.Employee.Management.Service.TodoService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/todo")
+@SecurityRequirement(name = "BearerAuth")
 public class TodoController {
 
 	private TodoService todoService;
@@ -35,7 +38,7 @@ public class TodoController {
 
 	@PreAuthorize("hasRole('EMPLOYEE')")
 	@PostMapping("/add")
-	public ResponseEntity<GenericResponse<TodoResponse>> addTodo(@RequestBody Todo todo, HttpServletRequest request) {
+	public ResponseEntity<GenericResponse<TodoResponse>> addTodo( @Valid @RequestBody Todo todo, HttpServletRequest request) {
 
 		String operation = request.getRequestURI();
 

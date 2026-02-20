@@ -19,10 +19,12 @@ import com.Practice.Employee.Management.ResponseModal.EmpAttendenceResponse;
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.AttendenceService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/attendence")
+@SecurityRequirement(name = "BearerAuth")
 public class AttendenceController {
 	
 	@Autowired

@@ -15,4 +15,6 @@ public interface ResponseCodeRespository extends JpaRepository<ResponseMessages,
 	@Query("SELECT r.message FROM ResponseMessages r WHERE r.code = :code AND :operation LIKE CONCAT(r.operation, '%')")
 	String getMessageByCode(@Param("code") String code, @Param("operation") String operation);
 
+	ResponseMessages findByCodeAndOperation(String code, String operation);
+
 }

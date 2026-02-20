@@ -21,12 +21,13 @@ import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.ResponseModal.TaskResponse;
 import com.Practice.Employee.Management.Service.TaskService;
 
-
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/tasks")
+@SecurityRequirement(name = "BearerAuth")
 public class TaskController {
 
 	private TaskService taskService;

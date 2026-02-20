@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.Practice.Employee.Management.ResponseModal.ReportResponse;
 import com.Practice.Employee.Management.Service.ReportService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RequestMapping("/reports")
 @RestController
+@SecurityRequirement(name = "BearerAuth")
 public class ReportController {
 	
 	

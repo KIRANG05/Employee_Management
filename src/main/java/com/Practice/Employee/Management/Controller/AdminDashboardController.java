@@ -11,10 +11,12 @@ import com.Practice.Employee.Management.ResponseModal.AdminDashboardSummaryRespo
 import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.Service.AdminDashboardService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/admin/dashboard")
+@SecurityRequirement(name = "BearerAuth")
 public class AdminDashboardController {
 
 	@Autowired

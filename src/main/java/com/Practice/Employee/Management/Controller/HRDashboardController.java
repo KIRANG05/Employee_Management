@@ -12,10 +12,12 @@ import com.Practice.Employee.Management.ResponseModal.GenericResponse;
 import com.Practice.Employee.Management.ResponseModal.HRDashboardSummaryResponse;
 import com.Practice.Employee.Management.Service.HRDashboardService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/hr/dashboard")
+@SecurityRequirement(name = "BearerAuth")
 public class HRDashboardController {
 	
 	@Autowired

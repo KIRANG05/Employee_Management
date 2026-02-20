@@ -37,7 +37,7 @@ public class TodoServiceImpl implements TodoService {
 		Todo saved = todoRepository.save(todo);
 		
 		TodoResponse todoResponse = new TodoResponse();
-		todoResponse.setTodo(todo);
+		todoResponse.setTodo(saved);
 		
 		String msg = responseCode.getMessageByCode(ResponseCode.TODO_ADD_SUCCESS, operation);
 		response.setIsSuccess(true);

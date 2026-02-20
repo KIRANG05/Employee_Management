@@ -21,10 +21,12 @@ import com.Practice.Employee.Management.ResponseModal.NotificationResponse;
 import com.Practice.Employee.Management.ResponseModal.PagedResponse;
 import com.Practice.Employee.Management.Service.NotificationService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/notification")
+@SecurityRequirement(name = "BearerAuth")
 public class NotificationController {
 	
 	@Autowired

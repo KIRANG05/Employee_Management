@@ -43,7 +43,7 @@ public class NotificationServiceImpl implements NotificationService{
 	}
 	
 	@Override
-	public void sendNotification(Users user, String type, String message) {
+	public void sendNotification(Users user, String type, String message) { // Individual Notification
 
 	    Notification notification = new Notification();
 	    notification.setType(type);
@@ -79,7 +79,7 @@ public class NotificationServiceImpl implements NotificationService{
 
 
 	@Override
-	public GenericResponse<NotificationResponse> saveNotification(Notification notification) {
+	public GenericResponse<NotificationResponse> saveNotification(Notification notification) { // Multiple Notification
 		
 		GenericResponse<NotificationResponse> response = new GenericResponse<>();
 		 NotificationResponse notificationResponse = new NotificationResponse();
